@@ -1,0 +1,93 @@
+<div class="container">
+    <div class="page-header">
+        <h1>
+            <lucide-icon [img]="CalendarIcon" [size]="32"></lucide-icon>
+            Reservas
+        </h1>
+        <div class="header-actions">
+            <button class="btn" [class.btn-primary]="showOnlyAtrasadas" [class.btn-secondary]="!showOnlyAtrasadas"
+                (click)="toggleAtrasadas()">
+                <lucide-icon [img]="AlertTriangleIcon" [size]="16"></lucide-icon>
+                {{ showOnlyAtrasadas ? 'Mostrar Todas' : 'Apenas Atrasadas' }}
+            </button>
+            <a routerLink="/reservas/nova" class="btn btn-primary">
+                <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+                Nova Reserva
+            </a>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        <p>Carregando reservas...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">
+        <span>{{ error }}</span>
+        <button class="btn btn-sm btn-secondary" (click)="loadReservas()">Tentar novamente</button>
+    </div>
+
+    <div *ngIf="!loading && !error && reservas.length === 0" class="card">
+        <div class="empty-state">
+            <lucide-icon [img]="CalendarIcon" [size]="48" [strokeWidth]="1"></lucide-icon>
+            <p>{{ showOnlyAtrasadas ? 'Nenhuma reserva atrasada' : 'Nenhuma reserva cadastrada' }}</p>
+            <a *ngIf="!showOnlyAtrasadas" routerLink="/reservas/nova" class="btn btn-primary">
+                <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+                Nova Reserva
+            </a>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && !error && reservas.length > 0" class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Livro</th>
+                    <th>Data Reserva</th>
+                    <th>Devolução Prevista</th>
+                    <th>Status</th>
+                    <th>Multa</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reserva of reservas">
+                    <td>{{ getClienteNome(reserva) }}</td>
+                    <td>{{ getLivroTitulo(reserva) }}</td>
+                    <td>{{ formatDate(reserva.dataReserva) }}</td>
+                    <td>{{ formatDate(reserva.dataPrevistaDevolucao) }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+              'badge-info': reserva.status === 'ativa',
+              'badge-error': reserva.status === 'atrasada',
+              'badge-success': reserva.status === 'concluida'
+            }">
+                            <lucide-icon
+                                [img]="reserva.status === 'ativa' ? ClockIcon : (reserva.status === 'atrasada' ? AlertTriangleIcon : CheckCircleIcon)"
+                                [size]="12"></lucide-icon>
+                            {{ reserva.status === 'ativa' ? 'Ativa' : (reserva.status === 'atrasada' ? 'Atrasada' :
+                            'Concluída') }}
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngIf="reserva.multa" class="multa-valor">
+                            {{ formatCurrency(reserva.multa.valorTotal) }}
+                            <small>({{ reserva.multa.diasAtraso }} dias)</small>
+                        </span>
+                        <span *ngIf="!reserva.multa">-</span>
+                    </td>
+                    <td class="actions">
+                        <button *ngIf="reserva.status !== 'concluida'" class="btn btn-sm btn-primary"
+                            (click)="devolver(reserva)" title="Devolver">
+                            <lucide-icon [img]="CheckCircleIcon" [size]="14"></lucide-icon>
+                            Devolver
+                        </button>
+                        <button class="btn btn-icon btn-danger" title="Excluir" (click)="deleteReserva(reserva)">
+                            <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+.page-header {
+    h1 {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-3);
+    }
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-3);
+}
+
+.multa-valor {
+    color: var(--color-error);
+    font-weight: var(--font-weight-semibold);
+
+    small {
+        font-weight: var(--font-weight-regular);
+        color: var(--color-gray-500);
+        margin-left: var(--spacing-1);
+    }
+}
