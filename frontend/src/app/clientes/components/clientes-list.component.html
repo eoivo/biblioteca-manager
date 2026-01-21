@@ -1,0 +1,66 @@
+<div class="container">
+  <div class="page-header">
+    <h1>
+      <lucide-icon [img]="UserIcon" [size]="32"></lucide-icon>
+      Clientes
+    </h1>
+    <a routerLink="/clientes/novo" class="btn btn-primary">
+      <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+      Novo Cliente
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <p>Carregando clientes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-error">
+    <span>{{ error }}</span>
+    <button class="btn btn-sm btn-secondary" (click)="loadClientes()">Tentar novamente</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && clientes.length === 0" class="card">
+    <div class="empty-state">
+      <lucide-icon [img]="UserIcon" [size]="48" [strokeWidth]="1"></lucide-icon>
+      <p>Nenhum cliente cadastrado ainda</p>
+      <a routerLink="/clientes/novo" class="btn btn-primary">
+        <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+        Adicionar Cliente
+      </a>
+    </div>
+  </div>
+
+  <!-- Clients Table -->
+  <div *ngIf="!loading && !error && clientes.length > 0" class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cliente of clientes">
+          <td>{{ cliente.nome }}</td>
+          <td>{{ formatCpf(cliente.cpf) }}</td>
+          <td>{{ cliente.email }}</td>
+          <td>{{ formatTelefone(cliente.telefone) }}</td>
+          <td class="actions">
+            <a [routerLink]="['/clientes', cliente._id, 'editar']" class="btn btn-icon" title="Editar">
+              <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
+            </a>
+            <button class="btn btn-icon btn-danger" title="Excluir" (click)="deleteCliente(cliente)">
+              <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
