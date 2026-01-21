@@ -1,0 +1,92 @@
+<div class="container">
+    <div class="page-header">
+        <h1>
+            <lucide-icon [img]="BookIcon" [size]="32"></lucide-icon>
+            {{ isEdit ? 'Editar Livro' : 'Novo Livro' }}
+        </h1>
+        <a routerLink="/livros" class="btn btn-secondary">
+            <lucide-icon [img]="ArrowLeftIcon" [size]="16"></lucide-icon>
+            Voltar
+        </a>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+        <p>Carregando...</p>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">
+        <span>{{ error }}</span>
+        <button class="btn btn-sm btn-secondary" (click)="error = null">
+            <lucide-icon [img]="XIcon" [size]="14"></lucide-icon>
+        </button>
+    </div>
+
+    <div *ngIf="!loading" class="card">
+        <div class="card-header">
+            <h3>Dados do Livro</h3>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-row">
+                <div class="form-group flex-2">
+                    <label for="titulo">Título *</label>
+                    <input type="text" id="titulo" formControlName="titulo" class="input"
+                        [class.error]="isFieldInvalid('titulo')" placeholder="Título do livro">
+                    <span *ngIf="isFieldInvalid('titulo')" class="error-message">
+                        {{ getFieldError('titulo') }}
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="autor">Autor *</label>
+                    <input type="text" id="autor" formControlName="autor" class="input"
+                        [class.error]="isFieldInvalid('autor')" placeholder="Nome do autor">
+                    <span *ngIf="isFieldInvalid('autor')" class="error-message">
+                        {{ getFieldError('autor') }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="isbn">ISBN</label>
+                    <input type="text" id="isbn" formControlName="isbn" class="input" placeholder="978-...">
+                </div>
+
+                <div class="form-group">
+                    <label for="editora">Editora</label>
+                    <input type="text" id="editora" formControlName="editora" class="input"
+                        placeholder="Nome da editora">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="anoPublicacao">Ano de Publicação</label>
+                    <input type="number" id="anoPublicacao" formControlName="anoPublicacao" class="input"
+                        [class.error]="isFieldInvalid('anoPublicacao')" placeholder="2024" min="1000" max="2100">
+                    <span *ngIf="isFieldInvalid('anoPublicacao')" class="error-message">
+                        {{ getFieldError('anoPublicacao') }}
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoria</label>
+                    <input type="text" id="categoria" formControlName="categoria" class="input"
+                        placeholder="Ex: Ficção, Técnico, etc">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a routerLink="/livros" class="btn btn-secondary">
+                    <lucide-icon [img]="XIcon" [size]="16"></lucide-icon>
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-primary" [disabled]="submitting">
+                    <lucide-icon [img]="SaveIcon" [size]="16"></lucide-icon>
+                    {{ submitting ? 'Salvando...' : 'Salvar' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
