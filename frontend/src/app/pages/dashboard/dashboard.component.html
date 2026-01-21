@@ -1,0 +1,95 @@
+<div class="dashboard-content animate-fade">
+    <div class="header-section">
+        <h1 class="title-font">Bem-vindo ao BiblioFlow</h1>
+        <p>Visão geral do sistema e principais métricas de hoje.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card card-premium">
+            <div class="icon-box bg-blue">
+                <lucide-icon [img]="BookIcon" [size]="24"></lucide-icon>
+            </div>
+            <div class="stat-info">
+                <span class="label">Total de Livros</span>
+                <span class="value">{{ stats.totalBooks }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card card-premium">
+            <div class="icon-box bg-emerald">
+                <lucide-icon [img]="CheckCircleIcon" [size]="24"></lucide-icon>
+            </div>
+            <div class="stat-info">
+                <span class="label">Livros Disponíveis</span>
+                <span class="value">{{ stats.availableBooks }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card card-premium">
+            <div class="icon-box bg-amber">
+                <lucide-icon [img]="CalendarIcon" [size]="24"></lucide-icon>
+            </div>
+            <div class="stat-info">
+                <span class="label">Reservas Ativas</span>
+                <span class="value">{{ stats.activeReservations }}</span>
+            </div>
+        </div>
+
+        <div class="stat-card card-premium">
+            <div class="icon-box bg-rose">
+                <lucide-icon [img]="AlertIcon" [size]="24"></lucide-icon>
+            </div>
+            <div class="stat-info">
+                <span class="label">Atrasos Detectados</span>
+                <span class="value">{{ stats.overdueCount }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="recent-section card-premium">
+            <div class="section-header">
+                <h3>Recursos Recentes</h3>
+                <a routerLink="/reservas">Ver todos <lucide-icon [img]="ChevronRightIcon" [size]="14"></lucide-icon></a>
+            </div>
+
+            <div class="recent-list">
+                <div *ngFor="let res of recentReservations" class="recent-item">
+                    <div class="item-info">
+                        <div class="book-placeholder">B</div>
+                        <div>
+                            <p class="book-title">{{ getLivroTitulo(res) }}</p>
+                            <p class="client-name">Reservado por: {{ getClienteNome(res) }}</p>
+                        </div>
+                    </div>
+                    <div class="item-status">
+                        <span class="status-label">Status</span>
+                        <span class="badge-premium" [ngClass]="'badge-' + res.status">
+                            {{ res.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <div *ngIf="recentReservations.length === 0" class="empty-recent">
+                    Nenhuma reserva recente encontrada.
+                </div>
+            </div>
+        </div>
+
+        <div class="fines-card bg-premium-gradient">
+            <div>
+                <h3>Multas Pendentes</h3>
+                <p>Valor total estimado em multas por atraso.</p>
+            </div>
+
+            <div class="fines-amount">
+                <span class="currency">{{ formatCurrency(stats.totalFines) }}</span>
+                <p>Baseado em {{ stats.overdueCount }} devoluções em atraso.</p>
+            </div>
+
+            <button class="btn-report">
+                Gerar Relatório de Caixa
+            </button>
+        </div>
+    </div>
+</div>

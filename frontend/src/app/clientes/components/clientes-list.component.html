@@ -1,66 +1,73 @@
-<div class="container">
-  <div class="page-header">
-    <h1>
-      <lucide-icon [img]="UserIcon" [size]="32"></lucide-icon>
-      Clientes
-    </h1>
-    <a routerLink="/clientes/novo" class="btn btn-primary">
-      <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+<div class="container animate-fade">
+  <div class="page-title-section">
+    <div>
+      <h1 class="title-font">Gestão de Clientes</h1>
+      <p>Gerencie o cadastro de leitores e usuários da biblioteca.</p>
+    </div>
+    <a routerLink="/clientes/novo" class="btn-premium btn-premium-primary">
+      <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
       Novo Cliente
     </a>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading">
-    <p>Carregando clientes...</p>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="error" class="alert alert-error">
-    <span>{{ error }}</span>
-    <button class="btn btn-sm btn-secondary" (click)="loadClientes()">Tentar novamente</button>
-  </div>
-
-  <!-- Empty State -->
-  <div *ngIf="!loading && !error && clientes.length === 0" class="card">
-    <div class="empty-state">
-      <lucide-icon [img]="UserIcon" [size]="48" [strokeWidth]="1"></lucide-icon>
-      <p>Nenhum cliente cadastrado ainda</p>
-      <a routerLink="/clientes/novo" class="btn btn-primary">
-        <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
-        Adicionar Cliente
-      </a>
+  <div class="card-premium no-padding overflow-hidden">
+    <div class="search-bar">
+      <div class="search-input-wrapper">
+        <lucide-icon [img]="SearchIcon" [size]="18" class="text-slate-400"></lucide-icon>
+        <input type="text" placeholder="Buscar cliente por nome ou CPF..." class="search-field">
+      </div>
     </div>
-  </div>
 
-  <!-- Clients Table -->
-  <div *ngIf="!loading && !error && clientes.length > 0" class="card">
-    <table class="table">
+    <div *ngIf="loading" class="loading-state">Carregando...</div>
+
+    <div *ngIf="error" class="error-msg text-center p-4">{{ error }}</div>
+
+    <table *ngIf="!loading && !error" class="table-premium">
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Nome do Cliente</th>
           <th>CPF</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Ações</th>
+          <th>Contato</th>
+          <th class="text-right">Ações</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let cliente of clientes">
-          <td>{{ cliente.nome }}</td>
-          <td>{{ formatCpf(cliente.cpf) }}</td>
-          <td>{{ cliente.email }}</td>
-          <td>{{ formatTelefone(cliente.telefone) }}</td>
-          <td class="actions">
-            <a [routerLink]="['/clientes', cliente._id, 'editar']" class="btn btn-icon" title="Editar">
-              <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
-            </a>
-            <button class="btn btn-icon btn-danger" title="Excluir" (click)="deleteCliente(cliente)">
-              <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
-            </button>
+          <td>
+            <div class="client-info">
+              <div class="client-avatar">{{ cliente.nome.charAt(0) }}</div>
+              <span class="client-name">{{ cliente.nome }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="cpf-code">{{ formatCpf(cliente.cpf) }}</span>
+          </td>
+          <td>
+            <div class="contact-info">
+              <span class="email">{{ cliente.email }}</span>
+              <span class="phone">{{ formatTelefone(cliente.telefone) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <a [routerLink]="['/clientes', cliente._id, 'editar']"
+                class="btn-icon-only text-slate-400 hover:text-blue-600" title="Editar">
+                <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
+              </a>
+              <button class="btn-icon-only text-slate-400 hover:text-rose-500" title="Excluir"
+                (click)="deleteCliente(cliente)">
+                <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="!loading && clientes.length === 0" class="empty-state">
+      <lucide-icon [img]="UserIcon" [size]="64" strokeWidth="1"></lucide-icon>
+      <h3>Nenhum cliente cadastrado</h3>
+      <p>O cadastro de clientes é necessário para realizar reservas.</p>
+    </div>
   </div>
 </div>

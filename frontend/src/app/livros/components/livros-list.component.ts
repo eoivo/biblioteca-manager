@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock } from 'lucide-angular';
+import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search } from 'lucide-angular';
 import { LivrosService } from '../../core/services/livros.service';
 import { Livro } from '../../core/models/livro.model';
 
@@ -23,6 +23,7 @@ export class LivrosListComponent implements OnInit {
     readonly Trash2Icon = Trash2;
     readonly CheckIcon = Check;
     readonly LockIcon = Lock;
+    readonly SearchIcon = Search;
 
     constructor(private livrosService: LivrosService) { }
 

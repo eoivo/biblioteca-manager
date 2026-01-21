@@ -1,84 +1,246 @@
-.app-layout {
+.app-container {
     display: flex;
     min-height: 100vh;
+    background-color: var(--color-slate-50);
 }
 
 .sidebar {
-    width: 250px;
-    background: var(--color-white);
-    border-right: 1px solid var(--color-gray-200);
+    width: 280px;
+    background: #0f172a;
+    /* Slate 900 */
+    color: white;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--shadow-sm);
+    position: fixed;
+    height: 100vh;
+    z-index: 50;
 }
 
 .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
-    padding: var(--spacing-6);
-    border-bottom: 1px solid var(--color-gray-200);
-    color: var(--color-primary-600);
+    padding: 2.5rem 1.5rem;
 
-    .logo-text {
-        font-size: var(--font-size-h4);
-        font-weight: var(--font-weight-bold);
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+
+            .brand {
+                font-size: 1.50rem;
+                font-weight: 800;
+                letter-spacing: -0.025em;
+                line-height: 1;
+            }
+
+            .sub {
+                font-size: 0.625rem;
+                font-weight: 600;
+                color: var(--color-slate-400);
+                letter-spacing: 0.1em;
+                margin-top: 0.25rem;
+            }
+        }
     }
 }
 
 .sidebar-nav {
-    padding: var(--spacing-4);
+    flex: 1;
+    padding: 0 1rem;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2);
+    gap: 0.5rem;
 }
 
-.nav-item {
+.nav-link {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
-    padding: var(--spacing-3) var(--spacing-4);
-    border-radius: var(--radius-md);
-    color: var(--color-gray-600);
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    color: var(--color-slate-400);
     text-decoration: none;
-    font-weight: var(--font-weight-medium);
+    font-weight: 600;
+    border-radius: 12px;
     transition: all 0.2s ease;
 
     &:hover {
-        background: var(--color-gray-100);
-        color: var(--color-primary-600);
+        color: white;
+        background: rgba(255, 255, 255, 0.05);
     }
 
     &.active {
-        background: var(--color-primary-50);
-        color: var(--color-primary-600);
+        color: white;
+        background: var(--color-primary-600);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary-600);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+
+            .name {
+                font-size: 0.875rem;
+                font-weight: 700;
+            }
+
+            .role {
+                font-size: 0.75rem;
+                color: var(--color-slate-400);
+            }
+        }
+    }
+}
+
+.btn-logout {
+    background: transparent;
+    border: none;
+    color: var(--color-slate-500);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+
+    &:hover {
+        color: var(--color-rose-500);
+        background: rgba(244, 63, 94, 0.1);
     }
 }
 
 .main-content {
     flex: 1;
-    background: var(--color-gray-100);
-    overflow-y: auto;
+    margin-left: 280px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 60px;
+.no-sidebar .main-content {
+    margin-left: 0;
+}
 
-        .logo-text,
-        .nav-item span {
-            display: none;
+.top-header {
+    height: 100px;
+    padding: 0 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+
+    .area-tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-slate-400);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .view-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--color-slate-700);
+        text-transform: capitalize;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+
+        .icon-btn {
+            position: relative;
+            background: white;
+            border: 1px solid var(--color-slate-200);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-slate-400);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+
+            .notification-dot {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 8px;
+                height: 8px;
+                background: var(--color-rose-500);
+                border: 2px solid white;
+                border-radius: 50%;
+            }
+        }
+
+        .user-circle {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(to top right, var(--color-primary-600), var(--color-indigo-600));
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: var(--shadow-md);
         }
     }
+}
 
-    .sidebar-header {
-        justify-content: center;
-        padding: var(--spacing-4);
+.content-wrapper {
+    padding: 0 3rem 3rem;
+    flex: 1;
+}
+
+.app-footer {
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-slate-200);
+    text-align: center;
+    color: var(--color-slate-400);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 80px;
     }
 
-    .nav-item {
-        justify-content: center;
-        padding: var(--spacing-3);
+    .main-content {
+        margin-left: 80px;
+    }
+
+    .sidebar-header .logo .logo-text,
+    .nav-link span,
+    .sidebar-footer .user-info {
+        display: none;
+    }
+
+    .top-header,
+    .content-wrapper {
+        padding: 0 1.5rem 1.5rem;
     }
 }

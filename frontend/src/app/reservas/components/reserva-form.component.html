@@ -1,79 +1,61 @@
-<div class="container">
-    <div class="page-header">
-        <h1>
-            <lucide-icon [img]="CalendarIcon" [size]="32"></lucide-icon>
-            Nova Reserva
-        </h1>
-        <a routerLink="/reservas" class="btn btn-secondary">
-            <lucide-icon [img]="ArrowLeftIcon" [size]="16"></lucide-icon>
+<div class="container animate-fade">
+    <div class="page-title-section">
+        <div>
+            <h1 class="title-font">Nova Reserva</h1>
+            <p>Selecione o leitor e a obra para realizar o empréstimo.</p>
+        </div>
+        <a routerLink="/reservas" class="btn-premium btn-premium-secondary">
+            <lucide-icon [img]="ArrowLeftIcon" [size]="18"></lucide-icon>
             Voltar
         </a>
     </div>
 
-    <div *ngIf="loading" class="loading">
-        <p>Carregando...</p>
-    </div>
+    <div class="card-premium">
+        <div *ngIf="loading" class="loading-state">Carregando dados...</div>
 
-    <div *ngIf="error" class="alert alert-error">
-        <span>{{ error }}</span>
-        <button class="btn btn-sm btn-secondary" (click)="error = null">
-            <lucide-icon [img]="XIcon" [size]="14"></lucide-icon>
-        </button>
-    </div>
+        <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()" class="form-premium">
+            <div class="form-section">
+                <h3 class="section-title">Dados do Empréstimo</h3>
 
-    <div *ngIf="!loading" class="card">
-        <div class="card-header">
-            <h3>Dados da Reserva</h3>
-        </div>
+                <div class="form-group mb-6">
+                    <label for="clienteId">Cliente / Leitor</label>
+                    <select id="clienteId" formControlName="clienteId" class="input-premium"
+                        [class.error]="isFieldInvalid('clienteId')">
+                        <option value="">Selecione um cliente...</option>
+                        <option *ngFor="let cliente of clientes" [value]="cliente._id">{{ cliente.nome }} ({{
+                            cliente.cpf }})</option>
+                    </select>
+                    <span class="error-msg" *ngIf="isFieldInvalid('clienteId')">{{ getFieldError('clienteId') }}</span>
+                </div>
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <div class="form-group">
-                <label for="clienteId">Cliente *</label>
-                <select id="clienteId" formControlName="clienteId" class="input"
-                    [class.error]="isFieldInvalid('clienteId')">
-                    <option value="">Selecione um cliente</option>
-                    <option *ngFor="let cliente of clientes" [value]="cliente._id">
-                        {{ cliente.nome }}
-                    </option>
-                </select>
-                <span *ngIf="isFieldInvalid('clienteId')" class="error-message">
-                    {{ getFieldError('clienteId') }}
-                </span>
+                <div class="form-group mb-6">
+                    <label for="livroId">Livro (Somente Disponíveis)</label>
+                    <select id="livroId" formControlName="livroId" class="input-premium"
+                        [class.error]="isFieldInvalid('livroId')">
+                        <option value="">Selecione um livro disponível...</option>
+                        <option *ngFor="let livro of livrosDisponiveis" [value]="livro._id">{{ livro.titulo }} - {{
+                            livro.autor }}</option>
+                    </select>
+                    <span class="error-msg" *ngIf="isFieldInvalid('livroId')">{{ getFieldError('livroId') }}</span>
+                    <p *ngIf="livrosDisponiveis.length === 0" class="warning-text">Não há livros disponíveis no momento.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataPrevistaDevolucao">Data de Devolução Prevista</label>
+                    <input type="date" id="dataPrevistaDevolucao" formControlName="dataPrevistaDevolucao"
+                        class="input-premium" [min]="getMinDate()">
+                    <span class="error-msg" *ngIf="isFieldInvalid('dataPrevistaDevolucao')">{{
+                        getFieldError('dataPrevistaDevolucao') }}</span>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="livroId">Livro (disponíveis) *</label>
-                <select id="livroId" formControlName="livroId" class="input" [class.error]="isFieldInvalid('livroId')">
-                    <option value="">Selecione um livro</option>
-                    <option *ngFor="let livro of livrosDisponiveis" [value]="livro._id">
-                        {{ livro.titulo }} - {{ livro.autor }}
-                    </option>
-                </select>
-                <span *ngIf="isFieldInvalid('livroId')" class="error-message">
-                    {{ getFieldError('livroId') }}
-                </span>
-                <span *ngIf="livrosDisponiveis.length === 0" class="info-message">
-                    Nenhum livro disponível para reserva
-                </span>
-            </div>
-
-            <div class="form-group">
-                <label for="dataPrevistaDevolucao">Data Prevista de Devolução *</label>
-                <input type="date" id="dataPrevistaDevolucao" formControlName="dataPrevistaDevolucao" class="input"
-                    [class.error]="isFieldInvalid('dataPrevistaDevolucao')" [min]="getMinDate()">
-                <span *ngIf="isFieldInvalid('dataPrevistaDevolucao')" class="error-message">
-                    {{ getFieldError('dataPrevistaDevolucao') }}
-                </span>
-            </div>
-
-            <div class="form-actions">
-                <a routerLink="/reservas" class="btn btn-secondary">
-                    <lucide-icon [img]="XIcon" [size]="16"></lucide-icon>
-                    Cancelar
-                </a>
-                <button type="submit" class="btn btn-primary" [disabled]="submitting || livrosDisponiveis.length === 0">
-                    <lucide-icon [img]="SaveIcon" [size]="16"></lucide-icon>
-                    {{ submitting ? 'Salvando...' : 'Criar Reserva' }}
+            <div class="form-actions-premium">
+                <button type="button" routerLink="/reservas" class="btn-premium btn-premium-secondary">Cancelar</button>
+                <button type="submit" class="btn-premium btn-premium-primary"
+                    [disabled]="submitting || livrosDisponiveis.length === 0">
+                    <lucide-icon *ngIf="!submitting" [img]="SaveIcon" [size]="18"></lucide-icon>
+                    {{ submitting ? 'Confirmando...' : 'Confirmar Reserva' }}
                 </button>
             </div>
         </form>

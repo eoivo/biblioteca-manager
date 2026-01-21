@@ -1,71 +1,78 @@
-<div class="container">
-    <div class="page-header">
-        <h1>
-            <lucide-icon [img]="BookIcon" [size]="32"></lucide-icon>
-            Livros
-        </h1>
-        <a routerLink="/livros/novo" class="btn btn-primary">
-            <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
+<div class="container animate-fade">
+    <div class="page-title-section">
+        <div>
+            <h1 class="title-font">Acervo Literário</h1>
+            <p>Controle o estoque e a disponibilidade dos títulos.</p>
+        </div>
+        <a routerLink="/livros/novo" class="btn-premium btn-premium-primary">
+            <lucide-icon [img]="PlusIcon" [size]="20"></lucide-icon>
             Novo Livro
         </a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-card card-premium">
+        <div class="search-box">
+            <lucide-icon [img]="SearchIcon" [size]="20" class="search-icon"></lucide-icon>
+            <input type="text" placeholder="Buscar por título ou autor..." class="input-premium">
+        </div>
+        <div class="filter-tabs">
+            <button class="tab active">Todos</button>
+            <button class="tab">Disponíveis</button>
+            <button class="tab">Reservados</button>
+        </div>
     </div>
 
     <div *ngIf="loading" class="loading">
         <p>Carregando livros...</p>
     </div>
 
-    <div *ngIf="error" class="alert alert-error">
-        <span>{{ error }}</span>
-        <button class="btn btn-sm btn-secondary" (click)="loadLivros()">Tentar novamente</button>
+    <div *ngIf="error" class="error-msg text-center mb-4">
+        {{ error }}
     </div>
 
-    <div *ngIf="!loading && !error && livros.length === 0" class="card">
-        <div class="empty-state">
-            <lucide-icon [img]="BookIcon" [size]="48" [strokeWidth]="1"></lucide-icon>
-            <p>Nenhum livro cadastrado ainda</p>
-            <a routerLink="/livros/novo" class="btn btn-primary">
-                <lucide-icon [img]="PlusIcon" [size]="16"></lucide-icon>
-                Adicionar Livro
-            </a>
+    <div *ngIf="!loading && !error && livros.length === 0" class="empty-state">
+        <lucide-icon [img]="BookIcon" [size]="64" strokeWidth="1"></lucide-icon>
+        <h3>Nenhum livro encontrado</h3>
+        <p>Adicione novos livros para começar seu acervo.</p>
+    </div>
+
+    <!-- Book Cards Grid -->
+    <div *ngIf="!loading" class="books-grid">
+        <div *ngFor="let livro of livros" class="book-card card-premium" [class]="'status-' + livro.status">
+            <div class="card-status-bar"></div>
+
+            <div class="card-body">
+                <div class="badge-row">
+                    <span class="badge-premium" [ngClass]="'badge-' + livro.status">
+                        {{ livro.status }}
+                    </span>
+                </div>
+
+                <h3 class="book-title">{{ livro.titulo }}</h3>
+                <p class="book-author">{{ livro.autor }}</p>
+
+                <div class="book-details">
+                    <div class="detail">
+                        <span>Categoria:</span>
+                        <strong>{{ livro.categoria || 'Geral' }}</strong>
+                    </div>
+                    <div class="detail">
+                        <span>ISBN:</span>
+                        <strong>{{ livro.isbn || '-' }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <a [routerLink]="['/livros', livro._id, 'editar']" class="btn-action edit" title="Editar">
+                    <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
+                </a>
+                <button class="btn-action delete" title="Excluir" (click)="deleteLivro(livro)"
+                    [disabled]="livro.status === 'reservado'">
+                    <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
+                </button>
+            </div>
         </div>
-    </div>
-
-    <div *ngIf="!loading && !error && livros.length > 0" class="card">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>ISBN</th>
-                    <th>Categoria</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let livro of livros">
-                    <td>{{ livro.titulo }}</td>
-                    <td>{{ livro.autor }}</td>
-                    <td>{{ livro.isbn || '-' }}</td>
-                    <td>{{ livro.categoria || '-' }}</td>
-                    <td>
-                        <span class="badge" [ngClass]="livro.status === 'disponivel' ? 'badge-success' : 'badge-gray'">
-                            <lucide-icon [img]="livro.status === 'disponivel' ? CheckIcon : LockIcon"
-                                [size]="12"></lucide-icon>
-                            {{ livro.status === 'disponivel' ? 'Disponível' : 'Reservado' }}
-                        </span>
-                    </td>
-                    <td class="actions">
-                        <a [routerLink]="['/livros', livro._id, 'editar']" class="btn btn-icon" title="Editar">
-                            <lucide-icon [img]="EditIcon" [size]="16"></lucide-icon>
-                        </a>
-                        <button class="btn btn-icon btn-danger" title="Excluir" (click)="deleteLivro(livro)"
-                            [disabled]="livro.status === 'reservado'">
-                            <lucide-icon [img]="Trash2Icon" [size]="16"></lucide-icon>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 </div>

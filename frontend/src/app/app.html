@@ -1,29 +1,81 @@
-<div class="app-layout">
+<div *ngIf="isLoggedIn$ | async as isLoggedIn; else loginView" class="app-container">
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <lucide-icon [img]="BookIcon" [size]="24"></lucide-icon>
-      <span class="logo-text">Biblioteca</span>
+      <div class="logo">
+        <lucide-icon [img]="LibraryIcon" [size]="28" class="text-blue-500"></lucide-icon>
+        <div class="logo-text">
+          <span class="brand">BiblioFlow</span>
+          <span class="sub">GESTÃO DE BIBLIOTECA</span>
+        </div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/clientes" routerLinkActive="active" class="nav-item">
-        <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+        <lucide-icon [img]="DashboardIcon" [size]="22"></lucide-icon>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
+        <lucide-icon [img]="UserIcon" [size]="22"></lucide-icon>
         <span>Clientes</span>
       </a>
-      <a routerLink="/livros" routerLinkActive="active" class="nav-item">
-        <lucide-icon [img]="BookIcon" [size]="20"></lucide-icon>
+      <a routerLink="/livros" routerLinkActive="active" class="nav-link">
+        <lucide-icon [img]="BookIcon" [size]="22"></lucide-icon>
         <span>Livros</span>
       </a>
-      <a routerLink="/reservas" routerLinkActive="active" class="nav-item">
-        <lucide-icon [img]="CalendarIcon" [size]="20"></lucide-icon>
+      <a routerLink="/reservas" routerLinkActive="active" class="nav-link">
+        <lucide-icon [img]="CalendarIcon" [size]="22"></lucide-icon>
         <span>Reservas</span>
       </a>
     </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="avatar">ADM</div>
+        <div class="user-info">
+          <span class="name">Bibliotecário</span>
+          <span class="role">Admin</span>
+        </div>
+      </div>
+      <button (click)="logout()" class="btn-logout" title="Sair do sistema">
+        <lucide-icon [img]="LogOutIcon" [size]="18"></lucide-icon>
+      </button>
+    </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- Main Area -->
   <main class="main-content">
-    <router-outlet></router-outlet>
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <span class="area-tag">Área Administrativa</span>
+        <h2 class="view-title">Módulo: {{ getModuleTitle(currentRoute$ | async) }}</h2>
+      </div>
+      <div class="header-right">
+        <button class="icon-btn">
+          <lucide-icon [img]="BellIcon" [size]="20"></lucide-icon>
+          <span class="notification-dot"></span>
+        </button>
+        <div class="user-circle"></div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <p>© 2024 BiblioFlow - Sistema de Gerenciamento de Biblioteca. Todos os direitos reservados.</p>
+      </footer>
+    </div>
   </main>
 </div>
+
+<ng-template #loginView>
+  <div class="app-container no-sidebar">
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</ng-template>
