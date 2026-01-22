@@ -1,0 +1,159 @@
+@use '../../../../styles/variables.scss';
+
+.notifications-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    max-width: 400px;
+    width: 100%;
+}
+
+.notification-item {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--color-slate-200);
+
+    &.type-success {
+        border-left: 4px solid #10b981;
+
+        .notification-icon {
+            color: #10b981;
+        }
+
+        .progress-bar {
+            background: #10b981;
+        }
+    }
+
+    &.type-error {
+        border-left: 4px solid #f43f5e;
+
+        .notification-icon {
+            color: #f43f5e;
+        }
+
+        .progress-bar {
+            background: #f43f5e;
+        }
+    }
+
+    &.type-info {
+        border-left: 4px solid #3b82f6;
+
+        .notification-icon {
+            color: #3b82f6;
+        }
+
+        .progress-bar {
+            background: #3b82f6;
+        }
+    }
+
+    &.type-warning {
+        border-left: 4px solid #f59e0b;
+
+        .notification-icon {
+            color: #f59e0b;
+        }
+
+        .progress-bar {
+            background: #f59e0b;
+        }
+    }
+}
+
+.notification-icon {
+    flex-shrink: 0;
+    padding-top: 2px;
+}
+
+.notification-content {
+    flex: 1;
+
+    h4 {
+        margin: 0 0 4px 0;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        color: var(--color-slate-900);
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+        color: var(--color-slate-600);
+        line-height: 1.5;
+    }
+}
+
+.close-btn {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-slate-400);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--color-slate-100);
+        color: var(--color-slate-600);
+    }
+}
+
+.progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    opacity: 0.3;
+    animation: shrink linear forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes shrink {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+@media (max-width: 640px) {
+    .notifications-container {
+        top: auto;
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: none;
+    }
+}

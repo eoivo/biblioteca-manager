@@ -14,10 +14,13 @@ export class ClientesService {
     constructor(private http: HttpClient) { }
 
     /**
-     * Lista todos os clientes
+     * Lista todos os clientes ou filtra por termo de busca
      */
-    findAll(): Observable<Cliente[]> {
-        return this.http.get<Cliente[]>(this.apiUrl).pipe(
+    findAll(q?: string): Observable<Cliente[]> {
+        const params: any = {};
+        if (q) params.q = q;
+
+        return this.http.get<Cliente[]>(this.apiUrl, { params }).pipe(
             catchError(this.handleError)
         );
     }

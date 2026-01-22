@@ -65,6 +65,10 @@ export const routes: Routes = [
                         loadComponent: () => import('./reservas/components/reserva-form.component').then(m => m.ReservaFormComponent)
                     }
                 ]
+            },
+            {
+                path: 'perfil',
+                loadComponent: () => import('./pages/profile/profile.component').then(m => m.ProfileComponent)
             }
         ]
     },

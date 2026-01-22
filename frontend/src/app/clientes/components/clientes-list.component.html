@@ -14,7 +14,8 @@
     <div class="search-bar">
       <div class="search-input-wrapper">
         <lucide-icon [img]="SearchIcon" [size]="18" class="text-slate-400"></lucide-icon>
-        <input type="text" placeholder="Buscar cliente por nome ou CPF..." class="search-field">
+        <input type="text" placeholder="Buscar cliente por nome ou CPF..." class="search-field"
+          (input)="onSearch($event)">
       </div>
     </div>
 

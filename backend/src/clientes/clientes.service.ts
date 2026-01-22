@@ -44,9 +44,19 @@ export class ClientesService {
     }
 
     /**
-     * Lista todos os clientes
+     * Lista todos os clientes ou filtra por termo de busca
      */
-    async findAll(): Promise<Cliente[]> {
+    async findAll(search?: string): Promise<Cliente[]> {
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            return this.clienteModel.find({
+                $or: [
+                    { nome: regex },
+                    { email: regex },
+                    { cpf: regex }
+                ]
+            }).exec();
+        }
         return this.clienteModel.find().exec();
     }
 

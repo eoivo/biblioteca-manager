@@ -1,0 +1,24 @@
+<div class="notifications-container">
+    <div *ngFor="let notification of notifications$ | async" class="notification-item card-premium"
+        [ngClass]="'type-' + notification.type">
+
+        <div class="notification-icon">
+            <lucide-icon *ngIf="notification.type === 'success'" [img]="CheckIcon" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="notification.type === 'error'" [img]="ErrorIcon" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="notification.type === 'info'" [img]="InfoIcon" [size]="20"></lucide-icon>
+            <lucide-icon *ngIf="notification.type === 'warning'" [img]="WarningIcon" [size]="20"></lucide-icon>
+        </div>
+
+        <div class="notification-content">
+            <h4 *ngIf="notification.title">{{ notification.title }}</h4>
+            <p>{{ notification.message }}</p>
+        </div>
+
+        <button class="close-btn" (click)="remove(notification.id)">
+            <lucide-icon [img]="CloseIcon" [size]="16"></lucide-icon>
+        </button>
+
+        <div class="progress-bar" [style.animationDuration.ms]="notification.duration">
+        </div>
+    </div>
+</div>

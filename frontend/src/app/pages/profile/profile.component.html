@@ -1,0 +1,58 @@
+<div class="container animate-fade" *ngIf="user$ | async as user">
+    <div class="page-title-section">
+        <div>
+            <h1 class="title-font">Meu Perfil</h1>
+            <p>Gerencie suas informações pessoais e configurações de conta.</p>
+        </div>
+    </div>
+
+    <div class="profile-grid">
+        <div class="card-premium profile-main-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <lucide-icon [img]="UserIcon" [size]="48"></lucide-icon>
+                </div>
+                <div class="profile-meta">
+                    <h2>{{ user.nome }}</h2>
+                    <span class="badge-premium badge-ativa">{{ user.role }}</span>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <div class="detail-item">
+                    <lucide-icon [img]="MailIcon" [size]="20"></lucide-icon>
+                    <div class="info">
+                        <label>E-mail</label>
+                        <span>{{ user.email }}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <lucide-icon [img]="ShieldIcon" [size]="20"></lucide-icon>
+                    <div class="info">
+                        <label>Nível de Acesso</label>
+                        <span>{{ user.role === 'admin' ? 'Administrador do Sistema' : 'Bibliotecário' }}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <lucide-icon [img]="UserIcon" [size]="20"></lucide-icon>
+                    <div class="info">
+                        <label>Username</label>
+                        <span>{{ user.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-premium security-card">
+            <h3 class="card-title">Segurança</h3>
+            <p>Sua conta está protegida com criptografia de ponta a ponta.</p>
+
+            <div class="security-info mt-6">
+                <div class="status-row">
+                    <span class="dot active"></span>
+                    <span>Sessão Ativa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

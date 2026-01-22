@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search } from 'lucide-angular';
-import { LivrosService } from '../../core/services/livros.service';
+import { LivrosService, NotificationService } from '../../core/services';
 import { Livro } from '../../core/models/livro.model';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
     selector: 'app-livros-list',
@@ -16,6 +17,9 @@ export class LivrosListComponent implements OnInit {
     livros: Livro[] = [];
     loading = true;
     error: string | null = null;
+    statusFilter: 'todos' | 'disponivel' | 'reservado' = 'todos';
+    private searchSubject = new Subject<string>();
+    private lastSearch = '';
 
     readonly BookIcon = Book;
     readonly PlusIcon = Plus;
@@ -25,9 +29,31 @@ export class LivrosListComponent implements OnInit {
     readonly LockIcon = Lock;
     readonly SearchIcon = Search;
 
-    constructor(private livrosService: LivrosService) { }
+    constructor(
+        private livrosService: LivrosService,
+        private notificationService: NotificationService
+    ) { }
 
     ngOnInit(): void {
+        this.loadLivros();
+
+        // Setup debounced search
+        this.searchSubject.pipe(
+            debounceTime(400),
+            distinctUntilChanged()
+        ).subscribe(searchTerm => {
+            this.lastSearch = searchTerm;
+            this.loadLivros();
+        });
+    }
+
+    onSearch(event: Event): void {
+        const value = (event.target as HTMLInputElement).value;
+        this.searchSubject.next(value);
+    }
+
+    setStatusFilter(status: 'todos' | 'disponivel' | 'reservado'): void {
+        this.statusFilter = status;
         this.loadLivros();
     }
 
@@ -35,13 +61,19 @@ export class LivrosListComponent implements OnInit {
         this.loading = true;
         this.error = null;
 
-        this.livrosService.findAll().subscribe({
+        this.livrosService.findAll(this.lastSearch).subscribe({
             next: (livros) => {
-                this.livros = livros;
+                if (this.statusFilter === 'todos') {
+                    this.livros = livros;
+                } else {
+                    this.livros = livros.filter(l => l.status === this.statusFilter);
+                }
                 this.loading = false;
             },
             error: (err) => {
-                this.error = err.message;
+                const msg = 'Erro ao carregar o acervo de livros';
+                this.notificationService.error(msg);
+                this.error = msg;
                 this.loading = false;
             }
         });
@@ -51,7 +83,7 @@ export class LivrosListComponent implements OnInit {
         if (!livro._id) return;
 
         if (livro.status === 'reservado') {
-            alert('Não é possível excluir um livro reservado');
+            this.notificationService.warning('Este livro está reservado e não pode ser excluído', 'Ação Bloqueada');
             return;
         }
 
@@ -59,9 +91,11 @@ export class LivrosListComponent implements OnInit {
             this.livrosService.remove(livro._id).subscribe({
                 next: () => {
                     this.livros = this.livros.filter(l => l._id !== livro._id);
+                    this.notificationService.success('Livro removido do acervo', 'Exclusão Concluída');
                 },
                 error: (err) => {
-                    alert(err.message);
+                    const msg = err.error?.message || 'Erro ao remover livro';
+                    this.notificationService.error(msg, 'Erro');
                 }
             });
         }

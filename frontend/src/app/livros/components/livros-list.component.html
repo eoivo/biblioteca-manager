@@ -14,12 +14,16 @@
     <div class="filters-card card-premium">
         <div class="search-box">
             <lucide-icon [img]="SearchIcon" [size]="20" class="search-icon"></lucide-icon>
-            <input type="text" placeholder="Buscar por título ou autor..." class="input-premium">
+            <input type="text" placeholder="Buscar por título ou autor..." class="input-premium"
+                (input)="onSearch($event)">
         </div>
         <div class="filter-tabs">
-            <button class="tab active">Todos</button>
-            <button class="tab">Disponíveis</button>
-            <button class="tab">Reservados</button>
+            <button class="tab" [class.active]="statusFilter === 'todos'"
+                (click)="setStatusFilter('todos')">Todos</button>
+            <button class="tab" [class.active]="statusFilter === 'disponivel'"
+                (click)="setStatusFilter('disponivel')">Disponíveis</button>
+            <button class="tab" [class.active]="statusFilter === 'reservado'"
+                (click)="setStatusFilter('reservado')">Reservados</button>
         </div>
     </div>
 

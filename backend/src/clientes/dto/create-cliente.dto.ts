@@ -55,4 +55,8 @@ export class CreateClienteDto {
     @ValidateNested()
     @Type(() => EnderecoDto)
     endereco?: EnderecoDto;
+
+    @IsOptional()
+    @IsString()
+    dataNascimento?: string;
 }

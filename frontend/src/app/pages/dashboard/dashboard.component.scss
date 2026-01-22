@@ -208,7 +208,6 @@
 
         &:hover {
             background: var(--color-primary-50);
-            transform: scale(1.02);
         }
     }
 }
@@ -219,20 +218,4 @@
     color: var(--color-slate-400);
     font-style: italic;
     font-size: 0.875rem;
-}
-
-.animate-fade {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }

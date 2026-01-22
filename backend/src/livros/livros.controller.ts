@@ -8,6 +8,7 @@ import {
     Delete,
     HttpCode,
     HttpStatus,
+    Query,
 } from '@nestjs/common';
 import { LivrosService } from './livros.service';
 import { CreateLivroDto, UpdateLivroDto } from './dto';
@@ -22,8 +23,8 @@ export class LivrosController {
     }
 
     @Get()
-    findAll() {
-        return this.livrosService.findAll();
+    findAll(@Query('q') q?: string) {
+        return this.livrosService.findAll(q);
     }
 
     @Get('disponiveis')

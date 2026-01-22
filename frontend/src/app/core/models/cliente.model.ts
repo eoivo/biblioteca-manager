@@ -13,6 +13,7 @@ export interface Cliente {
     email: string;
     telefone: string;
     endereco?: Endereco;
+    dataNascimento?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -23,6 +24,7 @@ export interface CreateClienteDto {
     email: string;
     telefone: string;
     endereco?: Endereco;
+    dataNascimento?: string;
 }
 
 export interface UpdateClienteDto extends Partial<CreateClienteDto> { }

@@ -8,6 +8,7 @@ import {
     Delete,
     HttpCode,
     HttpStatus,
+    Query,
 } from '@nestjs/common';
 import { ClientesService } from './clientes.service';
 import { CreateClienteDto, UpdateClienteDto } from './dto';
@@ -22,8 +23,8 @@ export class ClientesController {
     }
 
     @Get()
-    findAll() {
-        return this.clientesService.findAll();
+    findAll(@Query('q') q?: string) {
+        return this.clientesService.findAll(q);
     }
 
     @Get(':id')

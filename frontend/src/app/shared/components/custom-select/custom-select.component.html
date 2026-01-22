@@ -1,0 +1,32 @@
+<div class="select-wrapper" #selectContainer>
+    <div class="select-trigger" [class.open]="isOpen" [class.error]="error" (click)="toggleDropdown(); onTouched()">
+        <span class="selected-value" [class.placeholder]="!value">
+            {{ selectedOptionLabel }}
+        </span>
+        <lucide-icon [img]="ChevronDownIcon" [size]="16" class="chevron" [class.rotated]="isOpen"></lucide-icon>
+    </div>
+
+    <div *ngIf="isOpen" class="select-dropdown animate-fade">
+        <div *ngIf="searchable" class="search-container" (click)="$event.stopPropagation()">
+            <lucide-icon [img]="SearchIcon" [size]="14" class="search-icon"></lucide-icon>
+            <input type="text" [(ngModel)]="searchTerm" (input)="filterOptions()" placeholder="Buscar..."
+                class="search-input">
+        </div>
+
+        <div class="options-list">
+            <div *ngFor="let option of filteredOptions" class="option-item" [class.selected]="option.value === value"
+                (click)="selectOption(option)">
+                <div class="option-content">
+                    <lucide-icon *ngIf="option.icon" [img]="option.icon" [size]="16" class="option-icon"></lucide-icon>
+                    <span>{{ option.label }}</span>
+                </div>
+                <lucide-icon *ngIf="option.value === value" [img]="CheckIcon" [size]="14"
+                    class="check-icon"></lucide-icon>
+            </div>
+
+            <div *ngIf="filteredOptions.length === 0" class="no-results">
+                Nenhum resultado encontrado
+            </div>
+        </div>
+    </div>
+</div>

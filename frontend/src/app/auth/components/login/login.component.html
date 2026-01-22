@@ -4,17 +4,26 @@
             <div class="logo-box">
                 <lucide-icon [img]="LibraryIcon" [size]="40" class="text-blue-500"></lucide-icon>
             </div>
-            <h1 class="title-font">BiblioFlow</h1>
+            <h1 class="title-font">BiblioManager</h1>
             <p>Gestão Inteligente de Biblioteca</p>
         </div>
 
         <form (ngSubmit)="onSubmit()" class="login-form">
             <div class="form-group">
+                <label for="identifier">E-mail ou Usuário</label>
+                <div class="input-with-icon">
+                    <lucide-icon [img]="MailIcon" [size]="20" class="icon-input"></lucide-icon>
+                    <input type="text" id="identifier" name="identifier" [(ngModel)]="identifier" class="input-premium"
+                        placeholder="admin@bibliomanager.com" required>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="password">Senha de Acesso</label>
                 <div class="input-with-icon">
                     <lucide-icon [img]="LockIcon" [size]="20" class="icon-input"></lucide-icon>
                     <input type="password" id="password" name="password" [(ngModel)]="password" class="input-premium"
-                        placeholder="Digite sua senha" required>
+                        placeholder="••••••••" required>
                 </div>
             </div>
 
@@ -26,10 +35,6 @@
                 <lucide-icon [img]="LogInIcon" [size]="20"></lucide-icon>
                 {{ loading ? 'Autenticando...' : 'Entrar no Sistema' }}
             </button>
-
-            <div class="hint">
-                Use a senha <strong>admin123</strong> para testar.
-            </div>
         </form>
     </div>
 </div>

@@ -13,8 +13,11 @@ export class LivrosService {
 
     constructor(private http: HttpClient) { }
 
-    findAll(): Observable<Livro[]> {
-        return this.http.get<Livro[]>(this.apiUrl).pipe(
+    findAll(q?: string): Observable<Livro[]> {
+        const params: any = {};
+        if (q) params.q = q;
+
+        return this.http.get<Livro[]>(this.apiUrl, { params }).pipe(
             catchError(this.handleError)
         );
     }

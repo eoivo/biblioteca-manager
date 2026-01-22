@@ -19,65 +19,79 @@
 
                 <div class="form-row">
                     <div class="form-group flex-2">
-                        <label for="nome">Nome Completo</label>
+                        <label for="nome">Nome Completo <span class="required-mark">*</span></label>
                         <input type="text" id="nome" formControlName="nome" class="input-premium"
                             [class.error]="isFieldInvalid('nome')" placeholder="Ex: João Silva">
                         <span class="error-msg" *ngIf="isFieldInvalid('nome')">{{ getFieldError('nome') }}</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="cpf">CPF</label>
+                        <label for="cpf">CPF <span class="required-mark">*</span></label>
                         <input type="text" id="cpf" formControlName="cpf" class="input-premium"
-                            [class.error]="isFieldInvalid('cpf')" placeholder="000.000.000-00">
+                            [class.error]="isFieldInvalid('cpf')" placeholder="000.000.000-00"
+                            (input)="applyCpfMask($event)" maxlength="14">
                         <span class="error-msg" *ngIf="isFieldInvalid('cpf')">{{ getFieldError('cpf') }}</span>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email">E-mail</label>
+                        <label for="email">E-mail <span class="required-mark">*</span></label>
                         <input type="email" id="email" formControlName="email" class="input-premium"
                             [class.error]="isFieldInvalid('email')" placeholder="joao@exemplo.com">
                         <span class="error-msg" *ngIf="isFieldInvalid('email')">{{ getFieldError('email') }}</span>
                     </div>
 
                     <div class="form-group">
-                        <label for="telefone">Telefone</label>
+                        <label for="telefone">Telefone <span class="required-mark">*</span></label>
                         <input type="text" id="telefone" formControlName="telefone" class="input-premium"
-                            [class.error]="isFieldInvalid('telefone')" placeholder="(00) 00000-0000">
+                            [class.error]="isFieldInvalid('telefone')" placeholder="(00) 00000-0000"
+                            (input)="applyPhoneMask($event)" maxlength="15">
                         <span class="error-msg" *ngIf="isFieldInvalid('telefone')">{{ getFieldError('telefone')
                             }}</span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data de Nascimento</label>
+                        <app-calendar formControlName="dataNascimento"
+                            placeholder="Opcional - DD/MM/AAAA"></app-calendar>
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <h3 class="section-title">Endereço (Opcional)</h3>
+                <h3 class="section-title">Endereço</h3>
                 <div formGroupName="endereco">
                     <div class="form-row">
+                        <div class="form-group">
+                            <label>CEP <span class="required-mark">*</span></label>
+                            <div class="input-loading-wrapper">
+                                <input type="text" formControlName="cep" class="input-premium" placeholder="00000-000"
+                                    (input)="applyCepMask($event); onCepChange()" maxlength="9">
+                                <div *ngIf="searchingCep" class="input-spinner"></div>
+                            </div>
+                        </div>
                         <div class="form-group flex-2">
-                            <label>Rua</label>
+                            <label>Rua <span class="required-mark">*</span></label>
                             <input type="text" formControlName="rua" class="input-premium"
                                 placeholder="Rua, Avenida...">
-                        </div>
-                        <div class="form-group">
-                            <label>Número</label>
-                            <input type="text" formControlName="numero" class="input-premium" placeholder="123">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Cidade</label>
+                            <label>Número <span class="required-mark">*</span></label>
+                            <input type="text" formControlName="numero" class="input-premium" placeholder="123">
+                        </div>
+                        <div class="form-group flex-2">
+                            <label>Cidade <span class="required-mark">*</span></label>
                             <input type="text" formControlName="cidade" class="input-premium" placeholder="Cidade">
                         </div>
                         <div class="form-group">
-                            <label>Estado</label>
+                            <label>Estado <span class="required-mark">*</span></label>
                             <input type="text" formControlName="estado" class="input-premium" placeholder="UF"
                                 maxlength="2">
-                        </div>
-                        <div class="form-group">
-                            <label>CEP</label>
-                            <input type="text" formControlName="cep" class="input-premium" placeholder="00000-000">
                         </div>
                     </div>
                 </div>

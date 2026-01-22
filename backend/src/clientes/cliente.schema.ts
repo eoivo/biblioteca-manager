@@ -28,6 +28,9 @@ export class Cliente {
         estado?: string;
         cep?: string;
     };
+
+    @Prop({ type: Date })
+    dataNascimento?: Date;
 }
 
 export const ClienteSchema = SchemaFactory.createForClass(Cliente);

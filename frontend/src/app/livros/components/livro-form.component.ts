@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LucideAngularModule, Book, Save, X, ArrowLeft } from 'lucide-angular';
-import { LivrosService } from '../../core/services/livros.service';
+import { LivrosService, NotificationService } from '../../core/services';
+import { CustomSelectComponent, SelectOption } from '../../shared/components/custom-select/custom-select.component';
 
 @Component({
     selector: 'app-livro-form',
     standalone: true,
-    imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule],
+    imports: [CommonModule, RouterModule, ReactiveFormsModule, LucideAngularModule, CustomSelectComponent],
     templateUrl: './livro-form.component.html',
     styleUrl: './livro-form.component.scss'
 })
@@ -25,11 +26,29 @@ export class LivroFormComponent implements OnInit {
     readonly XIcon = X;
     readonly ArrowLeftIcon = ArrowLeft;
 
+    categorias: string[] = [
+        'Literatura Brasileira',
+        'Literatura Estrangeira',
+        'Ficção Científica',
+        'Fantasia',
+        'Suspense/Policial',
+        'Autoajuda',
+        'Didáticos',
+        'Biografia',
+        'História',
+        'Outro'
+    ];
+
+    categoriaOptions: SelectOption[] = this.categorias.map(cat => ({ label: cat, value: cat }));
+
+    mostrarOutraCategoria = false;
+
     constructor(
         private fb: FormBuilder,
         private livrosService: LivrosService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private notificationService: NotificationService
     ) { }
 
     ngOnInit(): void {
@@ -43,25 +62,50 @@ export class LivroFormComponent implements OnInit {
     }
 
     private initForm(): void {
+        const currentYear = new Date().getFullYear();
         this.form = this.fb.group({
             titulo: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(200)]],
             autor: ['', [Validators.required]],
             isbn: [''],
             editora: [''],
-            anoPublicacao: [null, [Validators.min(1000), Validators.max(2100)]],
-            categoria: ['']
+            anoPublicacao: [null, [Validators.min(1500), Validators.max(currentYear + 1)]],
+            categoria: ['', [Validators.required]],
+            outraCategoria: ['']
         });
+    }
+
+    onCategoriaChange() {
+        const categoria = this.form.get('categoria')?.value;
+        this.mostrarOutraCategoria = categoria === 'Outro';
+        if (this.mostrarOutraCategoria) {
+            this.form.get('outraCategoria')?.setValidators([Validators.required]);
+        } else {
+            this.form.get('outraCategoria')?.clearValidators();
+            this.form.get('outraCategoria')?.setValue('');
+        }
+        this.form.get('outraCategoria')?.updateValueAndValidity();
     }
 
     private loadLivro(id: string): void {
         this.loading = true;
         this.livrosService.findOne(id).subscribe({
             next: (livro) => {
-                this.form.patchValue(livro);
+                if (livro.categoria && !this.categorias.includes(livro.categoria)) {
+                    this.form.patchValue({
+                        ...livro,
+                        categoria: 'Outro',
+                        outraCategoria: livro.categoria
+                    });
+                    this.mostrarOutraCategoria = true;
+                } else {
+                    this.form.patchValue(livro);
+                }
                 this.loading = false;
             },
             error: (err) => {
-                this.error = err.message;
+                const msg = 'Não foi possível carregar os dados do livro';
+                this.notificationService.error(msg);
+                this.error = msg;
                 this.loading = false;
             }
         });
@@ -70,10 +114,16 @@ export class LivroFormComponent implements OnInit {
     onSubmit(): void {
         if (this.form.invalid) {
             this.markFormGroupTouched();
+            this.notificationService.warning('Verifique os campos do formulário', 'Campos Inválidos');
             return;
         }
 
-        const formData = { ...this.form.value };
+        const rawData = this.form.value;
+        const formData = {
+            ...rawData,
+            categoria: rawData.categoria === 'Outro' ? rawData.outraCategoria : rawData.categoria
+        };
+        delete formData.outraCategoria;
 
         // Limpar campos vazios
         Object.keys(formData).forEach(key => {
@@ -91,10 +141,15 @@ export class LivroFormComponent implements OnInit {
 
         request$.subscribe({
             next: () => {
+                this.notificationService.success(
+                    this.isEdit ? 'Livro atualizado com sucesso' : 'Livro adicionado ao acervo'
+                );
                 this.router.navigate(['/livros']);
             },
             error: (err) => {
-                this.error = err.message;
+                const msg = err.error?.message || 'Erro ao salvar informações do livro';
+                this.notificationService.error(msg);
+                this.error = msg;
                 this.submitting = false;
             }
         });

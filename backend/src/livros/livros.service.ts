@@ -27,9 +27,20 @@ export class LivrosService {
     }
 
     /**
-     * Lista todos os livros
+     * Lista todos os livros ou filtra por termo de busca
      */
-    async findAll(): Promise<Livro[]> {
+    async findAll(search?: string): Promise<Livro[]> {
+        if (search) {
+            const regex = new RegExp(search, 'i');
+            return this.livroModel.find({
+                $or: [
+                    { titulo: regex },
+                    { autor: regex },
+                    { categoria: regex },
+                    { isbn: regex }
+                ]
+            }).exec();
+        }
         return this.livroModel.find().exec();
     }
 

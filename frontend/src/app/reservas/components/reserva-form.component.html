@@ -18,35 +18,32 @@
                 <h3 class="section-title">Dados do Empréstimo</h3>
 
                 <div class="form-group mb-6">
-                    <label for="clienteId">Cliente / Leitor</label>
-                    <select id="clienteId" formControlName="clienteId" class="input-premium"
-                        [class.error]="isFieldInvalid('clienteId')">
-                        <option value="">Selecione um cliente...</option>
-                        <option *ngFor="let cliente of clientes" [value]="cliente._id">{{ cliente.nome }} ({{
-                            cliente.cpf }})</option>
-                    </select>
+                    <label for="clienteId">Cliente / Leitor <span class="required-mark">*</span></label>
+                    <app-custom-select formControlName="clienteId" [options]="clienteOptions"
+                        placeholder="Selecione um cliente..." [searchable]="true"
+                        [error]="isFieldInvalid('clienteId')"></app-custom-select>
                     <span class="error-msg" *ngIf="isFieldInvalid('clienteId')">{{ getFieldError('clienteId') }}</span>
                 </div>
 
                 <div class="form-group mb-6">
-                    <label for="livroId">Livro (Somente Disponíveis)</label>
-                    <select id="livroId" formControlName="livroId" class="input-premium"
-                        [class.error]="isFieldInvalid('livroId')">
-                        <option value="">Selecione um livro disponível...</option>
-                        <option *ngFor="let livro of livrosDisponiveis" [value]="livro._id">{{ livro.titulo }} - {{
-                            livro.autor }}</option>
-                    </select>
+                    <label for="livroId">Livro (Somente Disponíveis) <span class="required-mark">*</span></label>
+                    <app-custom-select formControlName="livroId" [options]="livroOptions"
+                        placeholder="Selecione um livro disponível..." [searchable]="true"
+                        [error]="isFieldInvalid('livroId')"></app-custom-select>
                     <span class="error-msg" *ngIf="isFieldInvalid('livroId')">{{ getFieldError('livroId') }}</span>
-                    <p *ngIf="livrosDisponiveis.length === 0" class="warning-text">Não há livros disponíveis no momento.
-                    </p>
+                    <p *ngIf="livroOptions.length === 0 && !loading" class="warning-text">Não há livros disponíveis no
+                        momento.</p>
                 </div>
 
                 <div class="form-group">
-                    <label for="dataPrevistaDevolucao">Data de Devolução Prevista</label>
-                    <input type="date" id="dataPrevistaDevolucao" formControlName="dataPrevistaDevolucao"
-                        class="input-premium" [min]="getMinDate()">
+                    <label for="dataPrevistaDevolucao">Data de Devolução Prevista <span
+                            class="required-mark">*</span></label>
+                    <app-calendar formControlName="dataPrevistaDevolucao" [minDate]="minDateValue"
+                        placeholder="Selecione ou digite a data"></app-calendar>
                     <span class="error-msg" *ngIf="isFieldInvalid('dataPrevistaDevolucao')">{{
                         getFieldError('dataPrevistaDevolucao') }}</span>
+                    <p class="hint-text mt-2">Identificamos o prazo automaticamente. Datas no passado serão alertadas
+                        pelo sistema.</p>
                 </div>
             </div>
 

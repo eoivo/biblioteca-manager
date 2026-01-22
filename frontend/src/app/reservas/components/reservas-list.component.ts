@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Calendar, Plus, CheckCircle, AlertTriangle, Clock, Trash2 } from 'lucide-angular';
-import { ReservasService } from '../../core/services/reservas.service';
+import { ReservasService, NotificationService } from '../../core/services';
 import { Reserva } from '../../core/models/reserva.model';
 
 @Component({
@@ -25,7 +25,10 @@ export class ReservasListComponent implements OnInit {
     readonly ClockIcon = Clock;
     readonly Trash2Icon = Trash2;
 
-    constructor(private reservasService: ReservasService) { }
+    constructor(
+        private reservasService: ReservasService,
+        private notificationService: NotificationService
+    ) { }
 
     ngOnInit(): void {
         this.loadReservas();
@@ -45,7 +48,9 @@ export class ReservasListComponent implements OnInit {
                 this.loading = false;
             },
             error: (err) => {
-                this.error = err.message;
+                const msg = 'Erro ao carregar lista de reservas';
+                this.notificationService.error(msg);
+                this.error = msg;
                 this.loading = false;
             }
         });
@@ -61,11 +66,16 @@ export class ReservasListComponent implements OnInit {
 
         if (confirm(`Confirmar devolução do livro?`)) {
             this.reservasService.devolver(reserva._id).subscribe({
-                next: () => {
+                next: (updatedReserva) => {
+                    this.notificationService.success('O livro foi devolvido com sucesso', 'Devolução Concluída');
+                    if (updatedReserva.multa && updatedReserva.multa.valorTotal > 0) {
+                        this.notificationService.info(`Multa total: R$ ${updatedReserva.multa.valorTotal.toFixed(2)}`, 'Multa Aplicada');
+                    }
                     this.loadReservas();
                 },
                 error: (err) => {
-                    alert(err.message);
+                    const msg = err.error?.message || 'Erro ao processar devolução';
+                    this.notificationService.error(msg, 'Erro');
                 }
             });
         }
@@ -78,9 +88,11 @@ export class ReservasListComponent implements OnInit {
             this.reservasService.remove(reserva._id).subscribe({
                 next: () => {
                     this.reservas = this.reservas.filter(r => r._id !== reserva._id);
+                    this.notificationService.success('A reserva foi removida do sistema');
                 },
                 error: (err) => {
-                    alert(err.message);
+                    const msg = err.error?.message || 'Erro ao remover reserva';
+                    this.notificationService.error(msg, 'Erro');
                 }
             });
         }

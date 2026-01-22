@@ -1,3 +1,4 @@
+<app-notification></app-notification>
 <div *ngIf="isLoggedIn$ | async as isLoggedIn; else loginView" class="app-container">
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -5,7 +6,7 @@
       <div class="logo">
         <lucide-icon [img]="LibraryIcon" [size]="28" class="text-blue-500"></lucide-icon>
         <div class="logo-text">
-          <span class="brand">BiblioFlow</span>
+          <span class="brand">BiblioManager</span>
           <span class="sub">GESTÃO DE BIBLIOTECA</span>
         </div>
       </div>
@@ -29,23 +30,9 @@
         <span>Reservas</span>
       </a>
     </nav>
-
-    <div class="sidebar-footer">
-      <div class="user-profile">
-        <div class="avatar">ADM</div>
-        <div class="user-info">
-          <span class="name">Bibliotecário</span>
-          <span class="role">Admin</span>
-        </div>
-      </div>
-      <button (click)="logout()" class="btn-logout" title="Sair do sistema">
-        <lucide-icon [img]="LogOutIcon" [size]="18"></lucide-icon>
-      </button>
-    </div>
   </aside>
 
-  <!-- Main Area -->
-  <main class="main-content">
+  <main class="main-content" (click)="hideUserDropdown()">
     <!-- Top Header -->
     <header class="top-header">
       <div class="header-left">
@@ -57,16 +44,39 @@
           <lucide-icon [img]="BellIcon" [size]="20"></lucide-icon>
           <span class="notification-dot"></span>
         </button>
-        <div class="user-circle"></div>
+
+        <div *ngIf="currentUser$ | async as user" class="user-menu-container">
+          <button class="user-profile-btn" (click)="toggleUserDropdown($event)">
+            <div class="user-avatar">{{ user.nome.charAt(0) }}</div>
+            <lucide-icon [img]="ChevronDownIcon" [size]="14" class="chevron"></lucide-icon>
+          </button>
+
+          <div *ngIf="showUserDropdown" class="user-dropdown animate-fade">
+            <div class="dropdown-header">
+              <span class="name">{{ user.nome }}</span>
+              <span class="email">{{ user.email }}</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/perfil" class="dropdown-item" (click)="showUserDropdown = false">
+              <lucide-icon [img]="UserIcon" [size]="16"></lucide-icon>
+              <span>Meu Perfil</span>
+            </a>
+            <button class="dropdown-item logout" (click)="logout()">
+              <lucide-icon [img]="LogOutIcon" [size]="16"></lucide-icon>
+              <span>Sair</span>
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
     <div class="content-wrapper">
-      <router-outlet></router-outlet>
-
+      <div class="main-view-container">
+        <router-outlet></router-outlet>
+      </div>
       <!-- Footer -->
       <footer class="app-footer">
-        <p>© 2024 BiblioFlow - Sistema de Gerenciamento de Biblioteca. Todos os direitos reservados.</p>
+        <p>© 2024 BiblioManager - Sistema de Gerenciamento de Biblioteca. Todos os direitos reservados.</p>
       </footer>
     </div>
   </main>
