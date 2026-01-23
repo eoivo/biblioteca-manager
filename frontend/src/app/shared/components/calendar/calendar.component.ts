@@ -21,6 +21,7 @@ export class CalendarComponent implements ControlValueAccessor {
     @Input() label: string = 'Selecione uma data';
     @Input() placeholder: string = 'DD/MM/AAAA';
     @Input() minDate: Date | null = null;
+    @Input() maxDate: Date | null = null;
 
     @ViewChild('calendarContainer') calendarContainer!: ElementRef;
 
@@ -36,6 +37,10 @@ export class CalendarComponent implements ControlValueAccessor {
         'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
         'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
     ];
+
+    viewMode: 'days' | 'months' | 'years' = 'days';
+    years: number[] = [];
+    startYear: number = 2020;
 
     readonly CalendarIcon = CalendarIcon;
     readonly PrevIcon = ChevronLeft;
@@ -57,8 +62,13 @@ export class CalendarComponent implements ControlValueAccessor {
 
     toggleCalendar() {
         this.showCalendar = !this.showCalendar;
-        if (this.showCalendar && this.selectedDate) {
-            this.viewDate = new Date(this.selectedDate);
+        if (this.showCalendar) {
+            this.viewMode = 'days';
+            if (this.selectedDate) {
+                this.viewDate = new Date(this.selectedDate);
+            } else {
+                this.viewDate = new Date();
+            }
         }
         this.generateCalendar();
     }
@@ -83,16 +93,103 @@ export class CalendarComponent implements ControlValueAccessor {
         }
     }
 
-    prevMonth(event: Event) {
+    generateYears() {
+        this.years = [];
+        const currentYear = this.viewDate.getFullYear();
+        // Start year is roughly 10 years back from viewDate if not set or if we are navigating
+        // To make it stable, let's use the startYear variable
+        for (let i = 0; i < 12; i++) {
+            this.years.push(this.startYear + i);
+        }
+    }
+
+    canGoPrev(): boolean {
+        const year = this.viewDate.getFullYear();
+        const month = this.viewDate.getMonth();
+
+        if (this.viewMode === 'days') {
+            if (!this.minDate) return true;
+            const lastDayOfPrevMonth = new Date(year, month, 0);
+            return lastDayOfPrevMonth >= this.minDate;
+        } else if (this.viewMode === 'months') {
+            if (!this.minDate) return true;
+            return year > this.minDate.getFullYear();
+        } else if (this.viewMode === 'years') {
+            if (!this.minDate) return true;
+            return this.startYear > this.minDate.getFullYear();
+        }
+        return true;
+    }
+
+    canGoNext(): boolean {
+        const year = this.viewDate.getFullYear();
+        const month = this.viewDate.getMonth();
+
+        if (this.viewMode === 'days') {
+            if (!this.maxDate) return true;
+            const firstDayOfNextMonth = new Date(year, month + 1, 1);
+            return firstDayOfNextMonth <= this.maxDate;
+        } else if (this.viewMode === 'months') {
+            if (!this.maxDate) return true;
+            return year < this.maxDate.getFullYear();
+        } else if (this.viewMode === 'years') {
+            if (!this.maxDate) return true;
+            return (this.startYear + 11) < this.maxDate.getFullYear();
+        }
+        return true;
+    }
+
+    prev(event: Event) {
         event.stopPropagation();
-        this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
+        if (!this.canGoPrev()) return;
+
+        if (this.viewMode === 'days') {
+            this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
+            this.generateCalendar();
+        } else if (this.viewMode === 'years') {
+            this.startYear -= 12;
+            this.generateYears();
+        } else if (this.viewMode === 'months') {
+            this.viewDate = new Date(this.viewDate.getFullYear() - 1, this.viewDate.getMonth(), 1);
+        }
+    }
+
+    next(event: Event) {
+        event.stopPropagation();
+        if (!this.canGoNext()) return;
+
+        if (this.viewMode === 'days') {
+            this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
+            this.generateCalendar();
+        } else if (this.viewMode === 'years') {
+            this.startYear += 12;
+            this.generateYears();
+        } else if (this.viewMode === 'months') {
+            this.viewDate = new Date(this.viewDate.getFullYear() + 1, this.viewDate.getMonth(), 1);
+        }
+    }
+
+    switchMode(mode: 'days' | 'months' | 'years') {
+        this.viewMode = mode;
+        if (mode === 'years') {
+            // Find the start year for the grid (multiples of 12)
+            const year = this.viewDate.getFullYear();
+            this.startYear = year - (year % 12);
+            this.generateYears();
+        }
+    }
+
+    selectMonth(index: number) {
+        if (this.isDisabledMonth(index)) return;
+        this.viewDate = new Date(this.viewDate.getFullYear(), index, 1);
+        this.viewMode = 'days';
         this.generateCalendar();
     }
 
-    nextMonth(event: Event) {
-        event.stopPropagation();
-        this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
-        this.generateCalendar();
+    selectYear(year: number) {
+        if (this.isDisabledYear(year)) return;
+        this.viewDate = new Date(year, this.viewDate.getMonth(), 1);
+        this.viewMode = 'months';
     }
 
     selectDate(day: number | null) {
@@ -101,7 +198,10 @@ export class CalendarComponent implements ControlValueAccessor {
         const date = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), day);
 
         if (this.minDate && date < this.minDate) {
-            // Option to handle disabled dates visually, for now we just return
+            return;
+        }
+
+        if (this.maxDate && date > this.maxDate) {
             return;
         }
 
@@ -126,9 +226,30 @@ export class CalendarComponent implements ControlValueAccessor {
     }
 
     isDisabled(day: number | null): boolean {
-        if (day === null || !this.minDate) return false;
+        if (day === null) return false;
         const date = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth(), day);
-        return date < this.minDate;
+
+        const isBeforeMin = this.minDate ? date < this.minDate : false;
+        const isAfterMax = this.maxDate ? date > this.maxDate : false;
+
+        return isBeforeMin || isAfterMax;
+    }
+
+    isDisabledMonth(monthIndex: number): boolean {
+        const year = this.viewDate.getFullYear();
+        const dateFirst = new Date(year, monthIndex, 1);
+        const dateLast = new Date(year, monthIndex + 1, 0);
+
+        if (this.maxDate && dateFirst > this.maxDate) return true;
+        if (this.minDate && dateLast < this.minDate) return true;
+
+        return false;
+    }
+
+    isDisabledYear(year: number): boolean {
+        if (this.maxDate && year > this.maxDate.getFullYear()) return true;
+        if (this.minDate && year < this.minDate.getFullYear()) return true;
+        return false;
     }
 
     formatDate(date: Date): string {
@@ -153,6 +274,7 @@ export class CalendarComponent implements ControlValueAccessor {
         if (cleaned.length > 4) formatted = formatted.substring(0, 5) + '/' + formatted.substring(5);
 
         this.value = formatted;
+        event.target.value = formatted;
 
         if (cleaned.length === 8) {
             const d = parseInt(cleaned.substring(0, 2));
@@ -160,10 +282,16 @@ export class CalendarComponent implements ControlValueAccessor {
             const y = parseInt(cleaned.substring(4, 8));
             const date = new Date(y, m, d);
             if (!isNaN(date.getTime())) {
-                this.selectedDate = date;
-                this.viewDate = new Date(date);
-                this.onChange(this.toIsoDate(date));
-                this.generateCalendar();
+                // Verificar limites ao digitar
+                const isBeforeMin = this.minDate ? date < this.minDate : false;
+                const isAfterMax = this.maxDate ? date > this.maxDate : false;
+
+                if (!isBeforeMin && !isAfterMax) {
+                    this.selectedDate = date;
+                    this.viewDate = new Date(date);
+                    this.onChange(this.toIsoDate(date));
+                    this.generateCalendar();
+                }
             }
         }
     }

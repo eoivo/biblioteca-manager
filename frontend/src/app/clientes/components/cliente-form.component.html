@@ -55,7 +55,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Data de Nascimento</label>
-                        <app-calendar formControlName="dataNascimento"
+                        <app-calendar formControlName="dataNascimento" [maxDate]="maxBirthDate"
                             placeholder="Opcional - DD/MM/AAAA"></app-calendar>
                     </div>
                 </div>
@@ -69,29 +69,42 @@
                             <label>CEP <span class="required-mark">*</span></label>
                             <div class="input-loading-wrapper">
                                 <input type="text" formControlName="cep" class="input-premium" placeholder="00000-000"
+                                    [class.error]="isFieldInvalid('endereco.cep')"
                                     (input)="applyCepMask($event); onCepChange()" maxlength="9">
                                 <div *ngIf="searchingCep" class="input-spinner"></div>
                             </div>
+                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.cep')">{{
+                                getFieldError('endereco.cep') }}</span>
                         </div>
                         <div class="form-group flex-2">
                             <label>Rua <span class="required-mark">*</span></label>
                             <input type="text" formControlName="rua" class="input-premium"
-                                placeholder="Rua, Avenida...">
+                                [class.error]="isFieldInvalid('endereco.rua')" placeholder="Rua, Avenida...">
+                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.rua')">{{
+                                getFieldError('endereco.rua') }}</span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Número <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="numero" class="input-premium" placeholder="123">
+                            <input type="text" formControlName="numero" class="input-premium"
+                                [class.error]="isFieldInvalid('endereco.numero')" placeholder="123">
+                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.numero')">{{
+                                getFieldError('endereco.numero') }}</span>
                         </div>
                         <div class="form-group flex-2">
                             <label>Cidade <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="cidade" class="input-premium" placeholder="Cidade">
+                            <input type="text" formControlName="cidade" class="input-premium"
+                                [class.error]="isFieldInvalid('endereco.cidade')" placeholder="Cidade">
+                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.cidade')">{{
+                                getFieldError('endereco.cidade') }}</span>
                         </div>
                         <div class="form-group">
                             <label>Estado <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="estado" class="input-premium" placeholder="UF"
-                                maxlength="2">
+                            <input type="text" formControlName="estado" class="input-premium"
+                                [class.error]="isFieldInvalid('endereco.estado')" placeholder="UF" maxlength="2">
+                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.estado')">{{
+                                getFieldError('endereco.estado') }}</span>
                         </div>
                     </div>
                 </div>

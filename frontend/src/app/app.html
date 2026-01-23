@@ -1,38 +1,44 @@
 <app-notification></app-notification>
-<div *ngIf="isLoggedIn$ | async as isLoggedIn; else loginView" class="app-container">
+<div *ngIf="isLoggedIn$ | async as isLoggedIn; else loginView" class="app-container"
+  [class.sidebar-collapsed]="sidebarCollapsed">
   <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="logo">
-        <lucide-icon [img]="LibraryIcon" [size]="28" class="text-blue-500"></lucide-icon>
-        <div class="logo-text">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header" [class.collapsed-header]="sidebarCollapsed">
+      <div class="logo" (click)="sidebarCollapsed ? toggleSidebar() : null" [class.clickable]="sidebarCollapsed"
+        [title]="sidebarCollapsed ? 'Expandir Menu' : ''">
+        <lucide-icon [img]="LibraryIcon" [size]="28" class="text-blue-500 logo-icon"></lucide-icon>
+        <div class="logo-text" *ngIf="!sidebarCollapsed">
           <span class="brand">BiblioManager</span>
           <span class="sub">GESTÃO DE BIBLIOTECA</span>
         </div>
       </div>
+      <button *ngIf="!sidebarCollapsed" class="btn-sidebar-toggle" (click)="toggleSidebar()" title="Recolher Menu">
+        <lucide-icon [img]="ToggleIcon" [size]="20"></lucide-icon>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link"
+        [title]="sidebarCollapsed ? 'Dashboard' : ''">
         <lucide-icon [img]="DashboardIcon" [size]="22"></lucide-icon>
-        <span>Dashboard</span>
+        <span *ngIf="!sidebarCollapsed">Dashboard</span>
       </a>
-      <a routerLink="/clientes" routerLinkActive="active" class="nav-link">
+      <a routerLink="/clientes" routerLinkActive="active" class="nav-link" [title]="sidebarCollapsed ? 'Clientes' : ''">
         <lucide-icon [img]="UserIcon" [size]="22"></lucide-icon>
-        <span>Clientes</span>
+        <span *ngIf="!sidebarCollapsed">Clientes</span>
       </a>
-      <a routerLink="/livros" routerLinkActive="active" class="nav-link">
+      <a routerLink="/livros" routerLinkActive="active" class="nav-link" [title]="sidebarCollapsed ? 'Livros' : ''">
         <lucide-icon [img]="BookIcon" [size]="22"></lucide-icon>
-        <span>Livros</span>
+        <span *ngIf="!sidebarCollapsed">Livros</span>
       </a>
-      <a routerLink="/reservas" routerLinkActive="active" class="nav-link">
+      <a routerLink="/reservas" routerLinkActive="active" class="nav-link" [title]="sidebarCollapsed ? 'Reservas' : ''">
         <lucide-icon [img]="CalendarIcon" [size]="22"></lucide-icon>
-        <span>Reservas</span>
+        <span *ngIf="!sidebarCollapsed">Reservas</span>
       </a>
     </nav>
   </aside>
 
-  <main class="main-content" (click)="hideUserDropdown()">
+  <main class="main-content" [class.collapsed]="sidebarCollapsed" (click)="hideUserDropdown()">
     <!-- Top Header -->
     <header class="top-header">
       <div class="header-left">
@@ -40,10 +46,7 @@
         <h2 class="view-title">Módulo: {{ getModuleTitle(currentRoute$ | async) }}</h2>
       </div>
       <div class="header-right">
-        <button class="icon-btn">
-          <lucide-icon [img]="BellIcon" [size]="20"></lucide-icon>
-          <span class="notification-dot"></span>
-        </button>
+        <!-- Notification Icon Removed -->
 
         <div *ngIf="currentUser$ | async as user" class="user-menu-container">
           <button class="user-profile-btn" (click)="toggleUserDropdown($event)">

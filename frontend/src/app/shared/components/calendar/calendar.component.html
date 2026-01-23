@@ -2,27 +2,56 @@
     <div class="input-with-icon" (click)="onTouched()">
         <lucide-icon [img]="CalendarIcon" [size]="18" class="icon-calendar" (click)="toggleCalendar()"></lucide-icon>
         <input type="text" [placeholder]="placeholder" [value]="value" (input)="onInputChange($event)"
-            class="input-premium" (focus)="onTouched()">
+            class="input-premium" (focus)="onTouched()" maxlength="10">
     </div>
 
     <div *ngIf="showCalendar" class="calendar-dropdown animate-fade">
         <div class="calendar-header">
-            <button type="button" class="btn-nav" (click)="prevMonth($event)">
+            <button type="button" class="btn-nav" [disabled]="!canGoPrev()" [class.disabled]="!canGoPrev()"
+                (click)="prev($event)">
                 <lucide-icon [img]="PrevIcon" [size]="16"></lucide-icon>
             </button>
             <div class="current-month">
-                {{ months[viewDate.getMonth()] }} {{ viewDate.getFullYear() }}
+                <ng-container *ngIf="viewMode === 'days'">
+                    <span (click)="switchMode('months')" class="clickable">{{ months[viewDate.getMonth()] }}</span>
+                    <span (click)="switchMode('years')" class="clickable"> {{ viewDate.getFullYear() }}</span>
+                </ng-container>
+                <ng-container *ngIf="viewMode === 'months'">
+                    <span (click)="switchMode('years')" class="clickable">{{ viewDate.getFullYear() }}</span>
+                </ng-container>
+                <ng-container *ngIf="viewMode === 'years'">
+                    <span (click)="switchMode('days')" class="clickable">{{ startYear }} - {{ startYear + 11 }}</span>
+                </ng-container>
             </div>
-            <button type="button" class="btn-nav" (click)="nextMonth($event)">
+            <button type="button" class="btn-nav" [disabled]="!canGoNext()" [class.disabled]="!canGoNext()"
+                (click)="next($event)">
                 <lucide-icon [img]="NextIcon" [size]="16"></lucide-icon>
             </button>
         </div>
 
-        <div class="calendar-grid">
+        <!-- Days View -->
+        <div *ngIf="viewMode === 'days'" class="calendar-grid">
             <div *ngFor="let day of weekDays" class="weekday">{{ day }}</div>
             <div *ngFor="let day of days" class="day" [class.empty]="day === null" [class.today]="isToday(day)"
                 [class.selected]="isSelected(day)" [class.disabled]="isDisabled(day)" (click)="selectDate(day)">
                 {{ day }}
+            </div>
+        </div>
+
+        <!-- Months View -->
+        <div *ngIf="viewMode === 'months'" class="selection-grid">
+            <div *ngFor="let month of months; let i = index" class="selection-item"
+                [class.active]="i === viewDate.getMonth()" [class.disabled]="isDisabledMonth(i)"
+                (click)="selectMonth(i)">
+                {{ month.substring(0, 3) }}
+            </div>
+        </div>
+
+        <!-- Years View -->
+        <div *ngIf="viewMode === 'years'" class="selection-grid">
+            <div *ngFor="let year of years" class="selection-item" [class.active]="year === viewDate.getFullYear()"
+                [class.disabled]="isDisabledYear(year)" (click)="selectYear(year)">
+                {{ year }}
             </div>
         </div>
     </div>

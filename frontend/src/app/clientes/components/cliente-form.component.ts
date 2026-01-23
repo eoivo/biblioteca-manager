@@ -30,6 +30,8 @@ export class ClienteFormComponent implements OnInit {
     readonly XIcon = X;
     readonly ArrowLeftIcon = ArrowLeft;
 
+    maxBirthDate: Date;
+
     constructor(
         private fb: FormBuilder,
         private clientesService: ClientesService,
@@ -37,7 +39,11 @@ export class ClienteFormComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private notificationService: NotificationService
-    ) { }
+    ) {
+        // Definir data máxima para nascimento: hoje menos 10 anos (conforme sugestão)
+        const today = new Date();
+        this.maxBirthDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+    }
 
     ngOnInit(): void {
         this.initForm();

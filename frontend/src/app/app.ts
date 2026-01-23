@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, User, Book, Calendar, LayoutDashboard, LogOut, Bell, Library, Settings, ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, User, Book, Calendar, LayoutDashboard, LogOut, Library, Settings, ChevronDown, Menu, PanelLeft } from 'lucide-angular';
 import { AuthService } from './core/services/auth.service';
 import { map, filter, startWith } from 'rxjs/operators';
 import { NotificationComponent } from './shared/components/notification/notification.component';
@@ -19,19 +19,25 @@ export class App {
 
   title = 'BiblioManager';
   showUserDropdown = false;
+  sidebarCollapsed = false;
 
   readonly DashboardIcon = LayoutDashboard;
   readonly UserIcon = User;
   readonly BookIcon = Book;
   readonly CalendarIcon = Calendar;
   readonly LogOutIcon = LogOut;
-  readonly BellIcon = Bell;
   readonly LibraryIcon = Library;
   readonly SettingsIcon = Settings;
   readonly ChevronDownIcon = ChevronDown;
+  readonly MenuIcon = Menu;
+  readonly ToggleIcon = PanelLeft;
 
   isLoggedIn$ = this.authService.isLoggedIn();
   currentUser$ = this.authService.user$;
+
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
 
   toggleUserDropdown(event: Event) {
     event.stopPropagation();
