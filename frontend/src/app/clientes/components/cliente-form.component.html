@@ -1,123 +1,199 @@
 <div class="container animate-fade">
-    <div class="page-title-section">
-        <div>
-            <h1 class="title-font">{{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}</h1>
-            <p>Preencha as informações para cadastrar o leitor.</p>
+  <div class="page-title-section">
+    <div>
+      <h1 class="title-font">{{ isEdit ? 'Editar Cliente' : 'Novo Cliente' }}</h1>
+      <p>Preencha as informações para cadastrar o leitor.</p>
+    </div>
+    <a routerLink="/clientes" class="btn-premium btn-premium-secondary">
+      <lucide-icon [img]="ArrowLeftIcon" [size]="18"></lucide-icon>
+      Voltar
+    </a>
+  </div>
+
+  <div class="card-premium">
+    <div *ngIf="loading" class="loading-state">Carregando dados...</div>
+
+    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()" class="form-premium">
+      <div class="form-section">
+        <h3 class="section-title">Informações Pessoais</h3>
+
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="nome">Nome Completo <span class="required-mark">*</span></label>
+            <input
+              type="text"
+              id="nome"
+              formControlName="nome"
+              class="input-premium"
+              [class.error]="isFieldInvalid('nome')"
+              placeholder="Ex: João Silva"
+            />
+            <span class="error-msg" *ngIf="isFieldInvalid('nome')">{{
+              getFieldError('nome')
+            }}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="cpf">CPF <span class="required-mark">*</span></label>
+            <div class="input-with-icon">
+              <input
+                type="text"
+                id="cpf"
+                formControlName="cpf"
+                class="input-premium"
+                [class.error]="isFieldInvalid('cpf')"
+                [class.success]="isCpfValid()"
+                placeholder="000.000.000-00"
+                (input)="applyCpfMask($event)"
+                maxlength="14"
+              />
+              <lucide-icon
+                *ngIf="isCpfValid()"
+                [img]="CheckIcon"
+                class="input-icon-success"
+                [size]="20"
+              ></lucide-icon>
+            </div>
+            <span class="error-msg" *ngIf="isFieldInvalid('cpf')">{{ getFieldError('cpf') }}</span>
+          </div>
         </div>
-        <a routerLink="/clientes" class="btn-premium btn-premium-secondary">
-            <lucide-icon [img]="ArrowLeftIcon" [size]="18"></lucide-icon>
-            Voltar
-        </a>
-    </div>
 
-    <div class="card-premium">
-        <div *ngIf="loading" class="loading-state">Carregando dados...</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">E-mail <span class="required-mark">*</span></label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="input-premium"
+              [class.error]="isFieldInvalid('email')"
+              placeholder="joao@exemplo.com"
+            />
+            <span class="error-msg" *ngIf="isFieldInvalid('email')">{{
+              getFieldError('email')
+            }}</span>
+          </div>
 
-        <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="onSubmit()" class="form-premium">
-            <div class="form-section">
-                <h3 class="section-title">Informações Pessoais</h3>
+          <div class="form-group">
+            <label for="telefone">Telefone <span class="required-mark">*</span></label>
+            <input
+              type="text"
+              id="telefone"
+              formControlName="telefone"
+              class="input-premium"
+              [class.error]="isFieldInvalid('telefone')"
+              placeholder="(00) 00000-0000"
+              (input)="applyPhoneMask($event)"
+              maxlength="15"
+            />
+            <span class="error-msg" *ngIf="isFieldInvalid('telefone')">{{
+              getFieldError('telefone')
+            }}</span>
+          </div>
+        </div>
 
-                <div class="form-row">
-                    <div class="form-group flex-2">
-                        <label for="nome">Nome Completo <span class="required-mark">*</span></label>
-                        <input type="text" id="nome" formControlName="nome" class="input-premium"
-                            [class.error]="isFieldInvalid('nome')" placeholder="Ex: João Silva">
-                        <span class="error-msg" *ngIf="isFieldInvalid('nome')">{{ getFieldError('nome') }}</span>
-                    </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data de Nascimento</label>
+            <app-calendar
+              formControlName="dataNascimento"
+              [maxDate]="maxBirthDate"
+              placeholder="Opcional - DD/MM/AAAA"
+            ></app-calendar>
+          </div>
+        </div>
+      </div>
 
-                    <div class="form-group">
-                        <label for="cpf">CPF <span class="required-mark">*</span></label>
-                        <input type="text" id="cpf" formControlName="cpf" class="input-premium"
-                            [class.error]="isFieldInvalid('cpf')" placeholder="000.000.000-00"
-                            (input)="applyCpfMask($event)" maxlength="14">
-                        <span class="error-msg" *ngIf="isFieldInvalid('cpf')">{{ getFieldError('cpf') }}</span>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="email">E-mail <span class="required-mark">*</span></label>
-                        <input type="email" id="email" formControlName="email" class="input-premium"
-                            [class.error]="isFieldInvalid('email')" placeholder="joao@exemplo.com">
-                        <span class="error-msg" *ngIf="isFieldInvalid('email')">{{ getFieldError('email') }}</span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="telefone">Telefone <span class="required-mark">*</span></label>
-                        <input type="text" id="telefone" formControlName="telefone" class="input-premium"
-                            [class.error]="isFieldInvalid('telefone')" placeholder="(00) 00000-0000"
-                            (input)="applyPhoneMask($event)" maxlength="15">
-                        <span class="error-msg" *ngIf="isFieldInvalid('telefone')">{{ getFieldError('telefone')
-                            }}</span>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Data de Nascimento</label>
-                        <app-calendar formControlName="dataNascimento" [maxDate]="maxBirthDate"
-                            placeholder="Opcional - DD/MM/AAAA"></app-calendar>
-                    </div>
-                </div>
+      <div class="form-section">
+        <h3 class="section-title">Endereço</h3>
+        <div formGroupName="endereco">
+          <div class="form-row">
+            <div class="form-group">
+              <label>CEP <span class="required-mark">*</span></label>
+              <div class="input-loading-wrapper">
+                <input
+                  type="text"
+                  formControlName="cep"
+                  class="input-premium"
+                  placeholder="00000-000"
+                  [class.error]="isFieldInvalid('endereco.cep')"
+                  (input)="applyCepMask($event); onCepChange()"
+                  maxlength="9"
+                />
+                <div *ngIf="searchingCep" class="input-spinner"></div>
+              </div>
+              <span class="error-msg" *ngIf="isFieldInvalid('endereco.cep')">{{
+                getFieldError('endereco.cep')
+              }}</span>
             </div>
-
-            <div class="form-section">
-                <h3 class="section-title">Endereço</h3>
-                <div formGroupName="endereco">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>CEP <span class="required-mark">*</span></label>
-                            <div class="input-loading-wrapper">
-                                <input type="text" formControlName="cep" class="input-premium" placeholder="00000-000"
-                                    [class.error]="isFieldInvalid('endereco.cep')"
-                                    (input)="applyCepMask($event); onCepChange()" maxlength="9">
-                                <div *ngIf="searchingCep" class="input-spinner"></div>
-                            </div>
-                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.cep')">{{
-                                getFieldError('endereco.cep') }}</span>
-                        </div>
-                        <div class="form-group flex-2">
-                            <label>Rua <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="rua" class="input-premium"
-                                [class.error]="isFieldInvalid('endereco.rua')" placeholder="Rua, Avenida...">
-                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.rua')">{{
-                                getFieldError('endereco.rua') }}</span>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Número <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="numero" class="input-premium"
-                                [class.error]="isFieldInvalid('endereco.numero')" placeholder="123">
-                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.numero')">{{
-                                getFieldError('endereco.numero') }}</span>
-                        </div>
-                        <div class="form-group flex-2">
-                            <label>Cidade <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="cidade" class="input-premium"
-                                [class.error]="isFieldInvalid('endereco.cidade')" placeholder="Cidade">
-                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.cidade')">{{
-                                getFieldError('endereco.cidade') }}</span>
-                        </div>
-                        <div class="form-group">
-                            <label>Estado <span class="required-mark">*</span></label>
-                            <input type="text" formControlName="estado" class="input-premium"
-                                [class.error]="isFieldInvalid('endereco.estado')" placeholder="UF" maxlength="2">
-                            <span class="error-msg" *ngIf="isFieldInvalid('endereco.estado')">{{
-                                getFieldError('endereco.estado') }}</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group flex-2">
+              <label>Rua <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                formControlName="rua"
+                class="input-premium"
+                [class.error]="isFieldInvalid('endereco.rua')"
+                placeholder="Rua, Avenida..."
+              />
+              <span class="error-msg" *ngIf="isFieldInvalid('endereco.rua')">{{
+                getFieldError('endereco.rua')
+              }}</span>
             </div>
-
-            <div class="form-actions-premium">
-                <button type="button" routerLink="/clientes"
-                    class="btn-premium btn-premium-secondary">Descartar</button>
-                <button type="submit" class="btn-premium btn-premium-primary" [disabled]="submitting">
-                    <lucide-icon *ngIf="!submitting" [img]="SaveIcon" [size]="18"></lucide-icon>
-                    {{ submitting ? 'Salvando...' : 'Salvar Alterações' }}
-                </button>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Número <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                formControlName="numero"
+                class="input-premium"
+                [class.error]="isFieldInvalid('endereco.numero')"
+                placeholder="123"
+              />
+              <span class="error-msg" *ngIf="isFieldInvalid('endereco.numero')">{{
+                getFieldError('endereco.numero')
+              }}</span>
             </div>
-        </form>
-    </div>
+            <div class="form-group flex-2">
+              <label>Cidade <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                formControlName="cidade"
+                class="input-premium"
+                [class.error]="isFieldInvalid('endereco.cidade')"
+                placeholder="Cidade"
+              />
+              <span class="error-msg" *ngIf="isFieldInvalid('endereco.cidade')">{{
+                getFieldError('endereco.cidade')
+              }}</span>
+            </div>
+            <div class="form-group">
+              <label>Estado <span class="required-mark">*</span></label>
+              <input
+                type="text"
+                formControlName="estado"
+                class="input-premium"
+                [class.error]="isFieldInvalid('endereco.estado')"
+                placeholder="UF"
+                maxlength="2"
+              />
+              <span class="error-msg" *ngIf="isFieldInvalid('endereco.estado')">{{
+                getFieldError('endereco.estado')
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions-premium">
+        <button type="button" routerLink="/clientes" class="btn-premium btn-premium-secondary">
+          Descartar
+        </button>
+        <button type="submit" class="btn-premium btn-premium-primary" [disabled]="submitting">
+          <lucide-icon *ngIf="!submitting" [img]="SaveIcon" [size]="18"></lucide-icon>
+          {{ submitting ? 'Salvando...' : 'Salvar Alterações' }}
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
