@@ -23,7 +23,7 @@ import { CreateLivroDto, UpdateLivroDto } from './dto';
 @ApiTags('livros')
 @Controller('livros')
 export class LivrosController {
-  constructor(private readonly livrosService: LivrosService) {}
+  constructor(private readonly livrosService: LivrosService) { }
 
   @Post()
   @ApiOperation({
@@ -58,6 +58,17 @@ export class LivrosController {
     type: Number,
     description: 'Itens por página',
   })
+  @ApiQuery({
+    name: 'sortField',
+    required: false,
+    description: 'Campo para ordenação (padrão: createdAt)',
+  })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Direção da ordenação (padrão: desc)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de livros retornada com sucesso',
@@ -66,8 +77,10 @@ export class LivrosController {
     @Query('q') q?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('sortField') sortField: string = 'createdAt',
+    @Query('sortDirection') sortDirection: 'asc' | 'desc' = 'desc',
   ) {
-    return this.livrosService.findAll(q, +page, +limit);
+    return this.livrosService.findAll(q, +page, +limit, sortField, sortDirection);
   }
 
   @Get('disponiveis')

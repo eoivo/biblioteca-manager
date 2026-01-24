@@ -4,11 +4,12 @@ import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Calendar, Plus, CheckCircle, AlertTriangle, Clock, Trash2, ChevronLeft, ChevronRight } from 'lucide-angular';
 import { ReservasService, NotificationService } from '../../core/services';
 import { Reserva } from '../../core/models/reserva.model';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
     selector: 'app-reservas-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, LucideAngularModule],
+    imports: [CommonModule, RouterModule, LucideAngularModule, ConfirmationModalComponent],
     templateUrl: './reservas-list.component.html',
     styleUrl: './reservas-list.component.scss'
 })
@@ -23,6 +24,17 @@ export class ReservasListComponent implements OnInit {
     currentPage = 1;
     pageSize = 10;
     totalItems = 0;
+
+    // Modal
+    modalOpen = false;
+    pendingAction: { type: 'delete' | 'devolve', reserva: Reserva } | null = null;
+    modalConfig = {
+        title: '',
+        message: '',
+        confirmText: 'Confirmar',
+        cancelText: 'Cancelar',
+        type: 'danger' as 'danger' | 'warning' | 'info'
+    };
 
     readonly CalendarIcon = Calendar;
     readonly PlusIcon = Plus;
@@ -75,41 +87,76 @@ export class ReservasListComponent implements OnInit {
         this.loadReservas();
     }
 
-    devolver(reserva: Reserva): void {
+    confirmDevolucao(reserva: Reserva): void {
         if (!reserva._id) return;
+        this.pendingAction = { type: 'devolve', reserva };
+        this.modalConfig = {
+            title: 'Confirmar Devolução',
+            message: `Confirmar a devolução do livro "${this.getLivroTitulo(reserva)}"?`,
+            confirmText: 'Confirmar Devolução',
+            cancelText: 'Cancelar',
+            type: 'info'
+        };
+        this.modalOpen = true;
+    }
 
-        if (confirm(`Confirmar devolução do livro?`)) {
-            this.reservasService.devolver(reserva._id).subscribe({
+    confirmDelete(reserva: Reserva): void {
+        if (!reserva._id) return;
+        this.pendingAction = { type: 'delete', reserva };
+        this.modalConfig = {
+            title: 'Excluir Reserva',
+            message: `Tem certeza que deseja remover o registro de reserva do livro "${this.getLivroTitulo(reserva)}"?`,
+            confirmText: 'Excluir Registro',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        };
+        this.modalOpen = true;
+    }
+
+    onModalConfirm(): void {
+        if (!this.pendingAction) return;
+
+        const { type, reserva } = this.pendingAction;
+
+        if (type === 'devolve') {
+            this.reservasService.devolver(reserva._id!).subscribe({
                 next: (updatedReserva) => {
                     this.notificationService.success('O livro foi devolvido com sucesso', 'Devolução Concluída');
                     if (updatedReserva.multa && updatedReserva.multa.valorTotal > 0) {
                         this.notificationService.info(`Multa total: R$ ${updatedReserva.multa.valorTotal.toFixed(2)}`, 'Multa Aplicada');
                     }
                     this.loadReservas();
+                    this.closeModal();
                 },
                 error: (err) => {
                     const msg = err.error?.message || 'Erro ao processar devolução';
                     this.notificationService.error(msg, 'Erro');
+                    this.closeModal();
+                }
+            });
+        } else if (type === 'delete') {
+            this.reservasService.remove(reserva._id!).subscribe({
+                next: () => {
+                    this.reservas = this.reservas.filter(r => r._id !== reserva._id);
+                    this.notificationService.success('A reserva foi removida do sistema');
+                    this.closeModal();
+                },
+                error: (err) => {
+                    const msg = err.error?.message || 'Erro ao remover reserva';
+                    this.notificationService.error(msg, 'Erro');
+                    this.closeModal();
                 }
             });
         }
     }
 
-    deleteReserva(reserva: Reserva): void {
-        if (!reserva._id) return;
+    onModalCancel(): void {
+        this.closeModal();
+    }
 
-        if (confirm('Deseja realmente excluir esta reserva?')) {
-            this.reservasService.remove(reserva._id).subscribe({
-                next: () => {
-                    this.reservas = this.reservas.filter(r => r._id !== reserva._id);
-                    this.notificationService.success('A reserva foi removida do sistema');
-                },
-                error: (err) => {
-                    const msg = err.error?.message || 'Erro ao remover reserva';
-                    this.notificationService.error(msg, 'Erro');
-                }
-            });
-        }
+    private closeModal(): void {
+        this.modalOpen = false;
+        this.pendingAction = null;
     }
 
     getClienteNome(reserva: Reserva): string {

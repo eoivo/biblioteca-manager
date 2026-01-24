@@ -17,17 +17,36 @@
             <input type="text" placeholder="Buscar por título ou autor..." class="input-premium"
                 (input)="onSearch($event)">
         </div>
-        <div class="filter-tabs">
-            <button class="tab" [class.active]="statusFilter === 'todos'"
-                (click)="setStatusFilter('todos')">Todos</button>
-            <button class="tab" [class.active]="statusFilter === 'disponivel'"
-                (click)="setStatusFilter('disponivel')">Disponíveis</button>
-            <button class="tab" [class.active]="statusFilter === 'reservado'"
-                (click)="setStatusFilter('reservado')">Reservados</button>
+        <div class="filter-actions">
+            <div class="filter-tabs">
+                <button class="tab" [class.active]="statusFilter === 'todos'"
+                    (click)="setStatusFilter('todos')">Todos</button>
+                <button class="tab" [class.active]="statusFilter === 'disponivel'"
+                    (click)="setStatusFilter('disponivel')">Disponíveis</button>
+                <button class="tab" [class.active]="statusFilter === 'reservado'"
+                    (click)="setStatusFilter('reservado')">Reservados</button>
+            </div>
+
+            <div class="sort-controls">
+                <span class="sort-label">Ordenar:</span>
+                <button class="btn-sort" [class.active]="currentSortField === 'createdAt'"
+                    (click)="sortBy('createdAt')">
+                    Cadastro
+                    <lucide-icon *ngIf="currentSortField === 'createdAt'"
+                        [img]="currentSortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon"
+                        [size]="14"></lucide-icon>
+                </button>
+                <button class="btn-sort" [class.active]="currentSortField === 'titulo'" (click)="sortBy('titulo')">
+                    Título
+                    <lucide-icon *ngIf="currentSortField === 'titulo'"
+                        [img]="currentSortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon"
+                        [size]="14"></lucide-icon>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div *ngIf="loading" class="loading">
+    <div *ngIf="loading && livros.length === 0" class="loading">
         <p>Carregando livros...</p>
     </div>
 
@@ -42,7 +61,7 @@
     </div>
 
     <!-- Book Cards Grid -->
-    <div *ngIf="!loading" class="books-grid">
+    <div *ngIf="livros.length > 0" class="books-grid" [class.is-reloading]="loading">
         <div *ngFor="let livro of livros" class="book-card card-premium" [class]="'status-' + livro.status">
             <div class="card-status-bar"></div>
 
@@ -51,6 +70,7 @@
                     <span class="badge-premium" [ngClass]="'badge-' + livro.status">
                         {{ livro.status }}
                     </span>
+                    <span class="date-badge">{{ formatDate(livro.createdAt) }}</span>
                 </div>
 
                 <h3 class="book-title">{{ livro.titulo }}</h3>
@@ -72,7 +92,7 @@
                 <a [routerLink]="['/livros', livro._id, 'editar']" class="btn-action edit" title="Editar">
                     <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
                 </a>
-                <button class="btn-action delete" title="Excluir" (click)="deleteLivro(livro)"
+                <button class="btn-action delete" title="Excluir" (click)="confirmDelete(livro)"
                     [disabled]="livro.status === 'reservado'">
                     <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
                 </button>
@@ -100,3 +120,8 @@
         </div>
     </div>
 </div>
+
+<app-confirmation-modal [isOpen]="modalOpen" [title]="modalConfig.title" [message]="modalConfig.message"
+    [confirmText]="modalConfig.confirmText" [cancelText]="modalConfig.cancelText" [type]="modalConfig.type"
+    (confirm)="onModalConfirm()" (cancel)="onModalCancel()">
+</app-confirmation-modal>

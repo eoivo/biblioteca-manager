@@ -191,7 +191,8 @@
         </button>
         <button type="submit" class="btn-premium btn-premium-primary" [disabled]="submitting">
           <lucide-icon *ngIf="!submitting" [img]="SaveIcon" [size]="18"></lucide-icon>
-          {{ submitting ? 'Salvando...' : 'Salvar Alterações' }}
+          <span *ngIf="submitting">Salvando...</span>
+          <span *ngIf="!submitting">{{ isEdit ? 'Salvar Alterações' : 'Criar Cliente' }}</span>
         </button>
       </div>
     </form>

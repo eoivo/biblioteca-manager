@@ -29,7 +29,7 @@ export class LivrosService {
     /**
      * Lista todos os livros ou filtra por termo de busca
      */
-    async findAll(search?: string, page: number = 1, limit: number = 10): Promise<{ items: Livro[], total: number, page: number, limit: number }> {
+    async findAll(search?: string, page: number = 1, limit: number = 10, sortField: string = 'createdAt', sortDirection: 'asc' | 'desc' = 'desc'): Promise<{ items: Livro[], total: number, page: number, limit: number }> {
         const skip = (page - 1) * limit;
         let query = {};
 
@@ -45,8 +45,11 @@ export class LivrosService {
             };
         }
 
+        const sort: any = {};
+        sort[sortField] = sortDirection === 'asc' ? 1 : -1;
+
         const [items, total] = await Promise.all([
-            this.livroModel.find(query).skip(skip).limit(limit).exec(),
+            this.livroModel.find(query).sort(sort).skip(skip).limit(limit).exec(),
             this.livroModel.countDocuments(query).exec()
         ]);
 

@@ -1,0 +1,26 @@
+<div class="modal-overlay animate-fade" *ngIf="isOpen" (click)="onCancel()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="icon-wrapper" [ngClass]="type">
+                <lucide-icon [img]="AlertIcon" [size]="24"></lucide-icon>
+            </div>
+            <button class="btn-close" (click)="onCancel()">
+                <lucide-icon [img]="CloseIcon" [size]="20"></lucide-icon>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <h3>{{ title }}</h3>
+            <p>{{ message }}</p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="onCancel()">
+                {{ cancelText }}
+            </button>
+            <button class="btn-confirm" [ngClass]="type" (click)="onConfirm()">
+                {{ confirmText }}
+            </button>
+        </div>
+    </div>
+</div>

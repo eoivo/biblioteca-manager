@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search, ChevronLeft, ChevronRight } from 'lucide-angular';
+import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-angular';
 import { LivrosService, NotificationService } from '../../core/services';
 import { Livro } from '../../core/models/livro.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
     selector: 'app-livros-list',
     standalone: true,
-    imports: [CommonModule, RouterModule, LucideAngularModule],
+    imports: [CommonModule, RouterModule, LucideAngularModule, ConfirmationModalComponent],
     templateUrl: './livros-list.component.html',
     styleUrl: './livros-list.component.scss'
 })
@@ -21,6 +22,21 @@ export class LivrosListComponent implements OnInit {
     private searchSubject = new Subject<string>();
     private lastSearch = '';
     protected readonly Math = Math;
+
+    // Sorting
+    currentSortField = 'createdAt';
+    currentSortDirection: 'asc' | 'desc' = 'desc';
+
+    // Modal State
+    modalOpen = false;
+    pendingDeleteId: string | null = null;
+    modalConfig = {
+        title: '',
+        message: '',
+        confirmText: 'Excluir',
+        cancelText: 'Cancelar',
+        type: 'danger' as 'danger' | 'warning' | 'info'
+    };
 
     // Pagination
     currentPage = 1;
@@ -36,6 +52,8 @@ export class LivrosListComponent implements OnInit {
     readonly SearchIcon = Search;
     readonly ChevronLeftIcon = ChevronLeft;
     readonly ChevronRightIcon = ChevronRight;
+    readonly ChevronUpIcon = ChevronUp;
+    readonly ChevronDownIcon = ChevronDown;
 
     constructor(
         private livrosService: LivrosService,
@@ -67,11 +85,22 @@ export class LivrosListComponent implements OnInit {
         this.loadLivros();
     }
 
+    sortBy(field: string): void {
+        if (this.currentSortField === field) {
+            this.currentSortDirection = this.currentSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.currentSortField = field;
+            this.currentSortDirection = 'asc';
+        }
+        this.currentPage = 1;
+        this.loadLivros();
+    }
+
     loadLivros(): void {
         this.loading = true;
         this.error = null;
 
-        this.livrosService.findAll(this.lastSearch, this.currentPage, this.pageSize).subscribe({
+        this.livrosService.findAll(this.lastSearch, this.currentPage, this.pageSize, this.currentSortField, this.currentSortDirection).subscribe({
             next: (response) => {
                 let items = response.items;
                 if (this.statusFilter !== 'todos') {
@@ -96,7 +125,7 @@ export class LivrosListComponent implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    deleteLivro(livro: Livro): void {
+    confirmDelete(livro: Livro): void {
         if (!livro._id) return;
 
         if (livro.status === 'reservado') {
@@ -104,17 +133,45 @@ export class LivrosListComponent implements OnInit {
             return;
         }
 
-        if (confirm(`Deseja realmente excluir o livro "${livro.titulo}"?`)) {
-            this.livrosService.remove(livro._id).subscribe({
+        this.pendingDeleteId = livro._id;
+        this.modalConfig = {
+            title: 'Excluir Livro',
+            message: `Tem certeza que deseja excluir o livro "${livro.titulo}"? Esta ação não pode ser desfeita.`,
+            confirmText: 'Excluir Livro',
+            cancelText: 'Cancelar',
+            type: 'danger'
+        };
+        this.modalOpen = true;
+    }
+
+    onModalConfirm(): void {
+        if (this.pendingDeleteId) {
+            this.livrosService.remove(this.pendingDeleteId).subscribe({
                 next: () => {
-                    this.livros = this.livros.filter(l => l._id !== livro._id);
+                    this.livros = this.livros.filter(l => l._id !== this.pendingDeleteId);
                     this.notificationService.success('Livro removido do acervo', 'Exclusão Concluída');
+                    this.closeModal();
                 },
                 error: (err) => {
                     const msg = err.error?.message || 'Erro ao remover livro';
                     this.notificationService.error(msg, 'Erro');
+                    this.closeModal();
                 }
             });
         }
+    }
+
+    onModalCancel(): void {
+        this.closeModal();
+    }
+
+    private closeModal(): void {
+        this.modalOpen = false;
+        this.pendingDeleteId = null;
+    }
+
+    formatDate(date: Date | string | undefined): string {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR');
     }
 }

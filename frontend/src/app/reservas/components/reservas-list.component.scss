@@ -55,6 +55,15 @@
 }
 
 .table-premium {
+    width: 100%;
+    border-collapse: collapse;
+    transition: opacity 0.3s ease;
+
+    &.is-reloading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
     .index-col {
         color: var(--color-slate-400);
         font-weight: 600;
@@ -216,6 +225,12 @@
         flex-direction: column;
         padding: 1rem;
         gap: 1.25rem;
+        transition: opacity 0.3s ease;
+
+        &.is-reloading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
     }
 
     .reserva-mobile-card {

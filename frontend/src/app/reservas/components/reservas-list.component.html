@@ -24,12 +24,12 @@
             </div>
         </div>
 
-        <div *ngIf="loading" class="loading-state">Carregando...</div>
+        <div *ngIf="loading && reservas.length === 0" class="loading-state">Carregando...</div>
 
         <div *ngIf="error" class="error-msg text-center p-4">{{ error }}</div>
 
         <!-- Desktop Table View -->
-        <table *ngIf="!loading && !error" class="table-premium hidden-mobile">
+        <table *ngIf="!error && reservas.length > 0" class="table-premium hidden-mobile" [class.is-reloading]="loading">
             <thead>
                 <tr>
                     <th>#</th>
@@ -72,12 +72,12 @@
                     <td>
                         <div class="action-buttons">
                             <button *ngIf="reserva.status !== 'concluida'" class="btn-concluir"
-                                (click)="devolver(reserva)">
+                                (click)="confirmDevolucao(reserva)">
                                 <lucide-icon [img]="CheckCircleIcon" [size]="16"></lucide-icon>
                                 Concluir
                             </button>
                             <button class="btn-icon-only text-slate-300 hover:text-rose-500"
-                                (click)="deleteReserva(reserva)">
+                                (click)="confirmDelete(reserva)">
                                 <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
                             </button>
                         </div>
@@ -87,7 +87,8 @@
         </table>
 
         <!-- Mobile Card View -->
-        <div *ngIf="!loading && !error" class="mobile-reserva-list hidden-desktop">
+        <div *ngIf="!error && reservas.length > 0" class="mobile-reserva-list hidden-desktop"
+            [class.is-reloading]="loading">
             <div *ngFor="let reserva of reservas" class="reserva-mobile-card">
                 <div class="card-status-dot" [ngClass]="'status-' + reserva.status"></div>
                 <div class="reserva-header">
@@ -120,11 +121,11 @@
 
                 <div class="reserva-actions">
                     <button *ngIf="reserva.status !== 'concluida'" class="btn-premium btn-premium-primary full-width"
-                        (click)="devolver(reserva)">
+                        (click)="confirmDevolucao(reserva)">
                         <lucide-icon [img]="CheckCircleIcon" [size]="18"></lucide-icon>
                         Concluir Devolução
                     </button>
-                    <button class="btn-premium btn-premium-secondary full-width" (click)="deleteReserva(reserva)">
+                    <button class="btn-premium btn-premium-secondary full-width" (click)="confirmDelete(reserva)">
                         <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
                         Excluir Registro
                     </button>
@@ -132,7 +133,7 @@
             </div>
         </div>
 
-        <div *ngIf="!loading && reservas.length === 0" class="empty-reservas">
+        <div *ngIf="!loading && !error && reservas.length === 0" class="empty-reservas">
             Nenhuma reserva encontrada.
         </div>
         <!-- Pagination -->
@@ -155,3 +156,8 @@
             </div>
         </div>
     </div>
+
+    <app-confirmation-modal [isOpen]="modalOpen" [title]="modalConfig.title" [message]="modalConfig.message"
+        [confirmText]="modalConfig.confirmText" [cancelText]="modalConfig.cancelText" [type]="modalConfig.type"
+        (confirm)="onModalConfirm()" (cancel)="onModalCancel()">
+    </app-confirmation-modal>

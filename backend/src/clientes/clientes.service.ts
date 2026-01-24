@@ -46,7 +46,10 @@ export class ClientesService {
     /**
      * Lista todos os clientes ou filtra por termo de busca
      */
-    async findAll(search?: string, page: number = 1, limit: number = 10): Promise<{ items: Cliente[], total: number, page: number, limit: number }> {
+    /**
+     * Lista todos os clientes ou filtra por termo de busca
+     */
+    async findAll(search?: string, page: number = 1, limit: number = 10, sortField: string = 'createdAt', sortDirection: 'asc' | 'desc' = 'desc'): Promise<{ items: Cliente[], total: number, page: number, limit: number }> {
         const skip = (page - 1) * limit;
         let query = {};
 
@@ -61,8 +64,11 @@ export class ClientesService {
             };
         }
 
+        const sort: any = {};
+        sort[sortField] = sortDirection === 'asc' ? 1 : -1;
+
         const [items, total] = await Promise.all([
-            this.clienteModel.find(query).skip(skip).limit(limit).exec(),
+            this.clienteModel.find(query).sort(sort).skip(skip).limit(limit).exec(),
             this.clienteModel.countDocuments(query).exec()
         ]);
 

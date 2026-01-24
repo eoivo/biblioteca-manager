@@ -13,8 +13,8 @@ export class LivrosService {
 
     constructor(private http: HttpClient) { }
 
-    findAll(q?: string, page: number = 1, limit: number = 10): Observable<PaginatedResponse<Livro>> {
-        const params: any = { page, limit };
+    findAll(q?: string, page: number = 1, limit: number = 10, sortField: string = 'createdAt', sortDirection: 'asc' | 'desc' = 'desc'): Observable<PaginatedResponse<Livro>> {
+        const params: any = { page, limit, sortField, sortDirection };
         if (q) params.q = q;
 
         return this.http.get<PaginatedResponse<Livro>>(this.apiUrl, { params }).pipe(

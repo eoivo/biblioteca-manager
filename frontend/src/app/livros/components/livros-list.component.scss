@@ -33,33 +33,12 @@
             order: 2;
         }
 
-        .filter-tabs {
+        .filter-actions {
             order: 1;
             justify-content: center;
             overflow-x: auto;
             padding: 0.5rem;
-
-            .tab {
-                flex: 1;
-                white-space: nowrap;
-                padding: 0.5rem 0.75rem;
-            }
-        }
-    }
-}
-
-@media (max-width: 640px) {
-    .page-title-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-
-        h1 {
-            font-size: 1.75rem;
-        }
-
-        .btn-premium {
-            width: 100%;
+            flex-wrap: wrap;
         }
     }
 }
@@ -98,6 +77,60 @@
     }
 }
 
+.filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .sort-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--color-slate-400);
+        margin-right: 0.25rem;
+    }
+
+    .btn-sort {
+        border: none;
+        background: transparent;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--color-slate-500);
+        padding: 0.375rem 0.75rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        transition: all 0.2s;
+
+        &:hover {
+            background: var(--color-slate-100);
+            color: var(--color-slate-700);
+        }
+
+        &.active {
+            background: var(--color-primary-50);
+            color: var(--color-primary-600);
+        }
+    }
+}
+
+.date-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-slate-400);
+    background: var(--color-slate-100);
+    padding: 0.125rem 0.5rem;
+    border-radius: 6px;
+    margin-left: 0.5rem;
+}
+
 .filter-tabs {
     display: flex;
     background: var(--color-slate-100);
@@ -127,10 +160,32 @@
     }
 }
 
+@media (max-width: 640px) {
+    .page-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        .btn-premium {
+            width: 100%;
+        }
+    }
+}
+
 .books-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    transition: opacity 0.3s ease;
+
+    &.is-reloading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
 }
 
 .book-card {

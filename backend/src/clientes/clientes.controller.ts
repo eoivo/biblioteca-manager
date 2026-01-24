@@ -23,7 +23,7 @@ import { CreateClienteDto, UpdateClienteDto } from './dto';
 @ApiTags('clientes')
 @Controller('clientes')
 export class ClientesController {
-  constructor(private readonly clientesService: ClientesService) {}
+  constructor(private readonly clientesService: ClientesService) { }
 
   @Post()
   @ApiOperation({
@@ -58,6 +58,17 @@ export class ClientesController {
     type: Number,
     description: 'Itens por página',
   })
+  @ApiQuery({
+    name: 'sortField',
+    required: false,
+    description: 'Campo para ordenação (padrão: createdAt)',
+  })
+  @ApiQuery({
+    name: 'sortDirection',
+    required: false,
+    enum: ['asc', 'desc'],
+    description: 'Direção da ordenação (padrão: desc)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de clientes retornada com sucesso',
@@ -66,8 +77,10 @@ export class ClientesController {
     @Query('q') q?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('sortField') sortField: string = 'createdAt',
+    @Query('sortDirection') sortDirection: 'asc' | 'desc' = 'desc',
   ) {
-    return this.clientesService.findAll(q, +page, +limit);
+    return this.clientesService.findAll(q, +page, +limit, sortField, sortDirection);
   }
 
   @Get(':id')

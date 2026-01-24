@@ -19,17 +19,34 @@
       </div>
     </div>
 
-    <div *ngIf="loading" class="loading-state">Carregando...</div>
+    <div *ngIf="loading && clientes.length === 0" class="loading-state">Carregando...</div>
 
     <div *ngIf="error" class="error-msg text-center p-4">{{ error }}</div>
 
     <!-- Desktop Table View -->
-    <table *ngIf="!loading && !error" class="table-premium hidden-mobile">
+    <table *ngIf="!error && clientes.length > 0" class="table-premium hidden-mobile" [class.is-reloading]="loading">
       <thead>
         <tr>
-          <th>Nome do Cliente</th>
+          <th (click)="sortBy('nome')" class="sortable-header">
+            <div class="th-content">
+              Nome do Cliente
+              <div class="sort-indicator" *ngIf="currentSortField === 'nome'">
+                <lucide-icon [img]="currentSortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon"
+                  [size]="16"></lucide-icon>
+              </div>
+            </div>
+          </th>
           <th>CPF</th>
           <th>Contato</th>
+          <th (click)="sortBy('createdAt')" class="sortable-header">
+            <div class="th-content">
+              Cadastro
+              <div class="sort-indicator" *ngIf="currentSortField === 'createdAt'">
+                <lucide-icon [img]="currentSortDirection === 'asc' ? ChevronUpIcon : ChevronDownIcon"
+                  [size]="16"></lucide-icon>
+              </div>
+            </div>
+          </th>
           <th class="text-right">Ações</th>
         </tr>
       </thead>
@@ -51,13 +68,16 @@
             </div>
           </td>
           <td>
+            <span class="text-sm text-slate-500">{{ formatDate(cliente.createdAt || cliente['createdAt']) }}</span>
+          </td>
+          <td>
             <div class="action-buttons">
               <a [routerLink]="['/clientes', cliente._id, 'editar']"
                 class="btn-icon-only text-slate-400 hover:text-blue-600" title="Editar">
                 <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
               </a>
               <button class="btn-icon-only text-slate-400 hover:text-rose-500" title="Excluir"
-                (click)="deleteCliente(cliente)">
+                (click)="confirmDelete(cliente)">
                 <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
               </button>
             </div>
@@ -67,7 +87,7 @@
     </table>
 
     <!-- Mobile Card View -->
-    <div *ngIf="!loading && !error" class="mobile-client-list hidden-desktop">
+    <div *ngIf="!error && clientes.length > 0" class="mobile-client-list hidden-desktop" [class.is-reloading]="loading">
       <div *ngFor="let cliente of clientes" class="client-mobile-card">
         <div class="card-top">
           <div class="client-info">
@@ -81,7 +101,7 @@
             <a [routerLink]="['/clientes', cliente._id, 'editar']" class="btn-icon-only text-blue-600">
               <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
             </a>
-            <button class="btn-icon-only text-rose-500" (click)="deleteCliente(cliente)">
+            <button class="btn-icon-only text-rose-500" (click)="confirmDelete(cliente)">
               <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
             </button>
           </div>
@@ -125,3 +145,8 @@
     </div>
   </div>
 </div>
+
+<app-confirmation-modal [isOpen]="modalOpen" [title]="modalConfig.title" [message]="modalConfig.message"
+  [confirmText]="modalConfig.confirmText" [cancelText]="modalConfig.cancelText" [type]="modalConfig.type"
+  (confirm)="onModalConfirm()" (cancel)="onModalCancel()">
+</app-confirmation-modal>
