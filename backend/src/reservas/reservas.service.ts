@@ -48,17 +48,27 @@ export class ReservasService {
     }
 
     /**
-     * Lista todas as reservas com dados populados
-     * Calcula multa dinamicamente para reservas atrasadas
+     * Lista todas as reservas com dados populados e suporte a filtros/paginação
      */
-    async findAll(): Promise<any[]> {
-        const reservas = await this.reservaModel
-            .find()
-            .populate('clienteId', 'nome cpf')
-            .populate('livroId', 'titulo autor')
-            .exec();
+    async findAll(page: number = 1, limit: number = 10, status?: string): Promise<{ items: any[], total: number, page: number, limit: number }> {
+        const skip = (page - 1) * limit;
+        const query: any = {};
+        if (status) {
+            query.status = status;
+        }
 
-        return reservas.map(r => this.calcularMultaSeAtrasada(r));
+        const [rawItems, total] = await Promise.all([
+            this.reservaModel.find(query)
+                .skip(skip)
+                .limit(limit)
+                .populate('clienteId', 'nome cpf')
+                .populate('livroId', 'titulo autor')
+                .exec(),
+            this.reservaModel.countDocuments(query).exec()
+        ]);
+
+        const items = rawItems.map(r => this.calcularMultaSeAtrasada(r));
+        return { items, total, page, limit };
     }
 
     /**

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Livro, CreateLivroDto, UpdateLivroDto } from '../models/livro.model';
+import { Livro, CreateLivroDto, UpdateLivroDto, PaginatedResponse } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -13,11 +13,11 @@ export class LivrosService {
 
     constructor(private http: HttpClient) { }
 
-    findAll(q?: string): Observable<Livro[]> {
-        const params: any = {};
+    findAll(q?: string, page: number = 1, limit: number = 10): Observable<PaginatedResponse<Livro>> {
+        const params: any = { page, limit };
         if (q) params.q = q;
 
-        return this.http.get<Livro[]>(this.apiUrl, { params }).pipe(
+        return this.http.get<PaginatedResponse<Livro>>(this.apiUrl, { params }).pipe(
             catchError(this.handleError)
         );
     }

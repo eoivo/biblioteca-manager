@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Calendar, Plus, CheckCircle, AlertTriangle, Clock, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Calendar, Plus, CheckCircle, AlertTriangle, Clock, Trash2, ChevronLeft, ChevronRight } from 'lucide-angular';
 import { ReservasService, NotificationService } from '../../core/services';
 import { Reserva } from '../../core/models/reserva.model';
 
@@ -16,7 +16,13 @@ export class ReservasListComponent implements OnInit {
     reservas: Reserva[] = [];
     loading = true;
     error: string | null = null;
-    showOnlyAtrasadas = false;
+    currentFilter: string = 'todas';
+    protected readonly Math = Math;
+
+    // Pagination
+    currentPage = 1;
+    pageSize = 10;
+    totalItems = 0;
 
     readonly CalendarIcon = Calendar;
     readonly PlusIcon = Plus;
@@ -24,6 +30,8 @@ export class ReservasListComponent implements OnInit {
     readonly AlertTriangleIcon = AlertTriangle;
     readonly ClockIcon = Clock;
     readonly Trash2Icon = Trash2;
+    readonly ChevronLeftIcon = ChevronLeft;
+    readonly ChevronRightIcon = ChevronRight;
 
     constructor(
         private reservasService: ReservasService,
@@ -38,13 +46,12 @@ export class ReservasListComponent implements OnInit {
         this.loading = true;
         this.error = null;
 
-        const request$ = this.showOnlyAtrasadas
-            ? this.reservasService.findAtrasadas()
-            : this.reservasService.findAll();
+        const status = this.currentFilter === 'todas' ? undefined : this.currentFilter;
 
-        request$.subscribe({
-            next: (reservas) => {
-                this.reservas = reservas;
+        this.reservasService.findAll(this.currentPage, this.pageSize, status).subscribe({
+            next: (response) => {
+                this.reservas = response.items;
+                this.totalItems = response.total;
                 this.loading = false;
             },
             error: (err) => {
@@ -56,8 +63,15 @@ export class ReservasListComponent implements OnInit {
         });
     }
 
-    toggleAtrasadas(): void {
-        this.showOnlyAtrasadas = !this.showOnlyAtrasadas;
+    changePage(page: number): void {
+        this.currentPage = page;
+        this.loadReservas();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    setFilter(status: string): void {
+        this.currentFilter = status;
+        this.currentPage = 1;
         this.loadReservas();
     }
 

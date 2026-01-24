@@ -29,19 +29,28 @@ export class LivrosService {
     /**
      * Lista todos os livros ou filtra por termo de busca
      */
-    async findAll(search?: string): Promise<Livro[]> {
+    async findAll(search?: string, page: number = 1, limit: number = 10): Promise<{ items: Livro[], total: number, page: number, limit: number }> {
+        const skip = (page - 1) * limit;
+        let query = {};
+
         if (search) {
             const regex = new RegExp(search, 'i');
-            return this.livroModel.find({
+            query = {
                 $or: [
                     { titulo: regex },
                     { autor: regex },
                     { categoria: regex },
                     { isbn: regex }
                 ]
-            }).exec();
+            };
         }
-        return this.livroModel.find().exec();
+
+        const [items, total] = await Promise.all([
+            this.livroModel.find(query).skip(skip).limit(limit).exec(),
+            this.livroModel.countDocuments(query).exec()
+        ]);
+
+        return { items, total, page, limit };
     }
 
     /**

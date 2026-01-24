@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Cliente, CreateClienteDto, UpdateClienteDto } from '../models';
+import { Cliente, CreateClienteDto, UpdateClienteDto, PaginatedResponse } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -14,13 +14,13 @@ export class ClientesService {
     constructor(private http: HttpClient) { }
 
     /**
-     * Lista todos os clientes ou filtra por termo de busca
+     * Lista todos os clientes ou filtra por termo de busca com paginação
      */
-    findAll(q?: string): Observable<Cliente[]> {
-        const params: any = {};
+    findAll(q?: string, page: number = 1, limit: number = 10): Observable<PaginatedResponse<Cliente>> {
+        const params: any = { page, limit };
         if (q) params.q = q;
 
-        return this.http.get<Cliente[]>(this.apiUrl, { params }).pipe(
+        return this.http.get<PaginatedResponse<Cliente>>(this.apiUrl, { params }).pipe(
             catchError(this.handleError)
         );
     }

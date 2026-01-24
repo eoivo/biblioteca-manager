@@ -71,10 +71,10 @@ export class ReservaFormComponent implements OnInit {
 
         // Carregar clientes e livros disponíveis
         Promise.all([
-            this.clientesService.findAll().toPromise(),
+            this.clientesService.findAll(undefined, 1, 1000).toPromise(),
             this.livrosService.findDisponiveis().toPromise()
-        ]).then(([clientes, livros]) => {
-            this.clientes = clientes || [];
+        ]).then(([clientesResponse, livros]) => {
+            this.clientes = clientesResponse?.items || [];
             this.livrosDisponiveis = livros || [];
 
             this.clienteOptions = this.clientes.map(c => ({

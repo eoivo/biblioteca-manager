@@ -46,18 +46,27 @@ export class ClientesService {
     /**
      * Lista todos os clientes ou filtra por termo de busca
      */
-    async findAll(search?: string): Promise<Cliente[]> {
+    async findAll(search?: string, page: number = 1, limit: number = 10): Promise<{ items: Cliente[], total: number, page: number, limit: number }> {
+        const skip = (page - 1) * limit;
+        let query = {};
+
         if (search) {
             const regex = new RegExp(search, 'i');
-            return this.clienteModel.find({
+            query = {
                 $or: [
                     { nome: regex },
                     { email: regex },
                     { cpf: regex }
                 ]
-            }).exec();
+            };
         }
-        return this.clienteModel.find().exec();
+
+        const [items, total] = await Promise.all([
+            this.clienteModel.find(query).skip(skip).limit(limit).exec(),
+            this.clienteModel.countDocuments(query).exec()
+        ]);
+
+        return { items, total, page, limit };
     }
 
     /**

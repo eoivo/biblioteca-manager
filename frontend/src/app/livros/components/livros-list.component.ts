@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search } from 'lucide-angular';
+import { LucideAngularModule, Book, Plus, Edit, Trash2, Check, Lock, Search, ChevronLeft, ChevronRight } from 'lucide-angular';
 import { LivrosService, NotificationService } from '../../core/services';
 import { Livro } from '../../core/models/livro.model';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -20,6 +20,12 @@ export class LivrosListComponent implements OnInit {
     statusFilter: 'todos' | 'disponivel' | 'reservado' = 'todos';
     private searchSubject = new Subject<string>();
     private lastSearch = '';
+    protected readonly Math = Math;
+
+    // Pagination
+    currentPage = 1;
+    pageSize = 10;
+    totalItems = 0;
 
     readonly BookIcon = Book;
     readonly PlusIcon = Plus;
@@ -28,6 +34,8 @@ export class LivrosListComponent implements OnInit {
     readonly CheckIcon = Check;
     readonly LockIcon = Lock;
     readonly SearchIcon = Search;
+    readonly ChevronLeftIcon = ChevronLeft;
+    readonly ChevronRightIcon = ChevronRight;
 
     constructor(
         private livrosService: LivrosService,
@@ -43,6 +51,7 @@ export class LivrosListComponent implements OnInit {
             distinctUntilChanged()
         ).subscribe(searchTerm => {
             this.lastSearch = searchTerm;
+            this.currentPage = 1;
             this.loadLivros();
         });
     }
@@ -54,6 +63,7 @@ export class LivrosListComponent implements OnInit {
 
     setStatusFilter(status: 'todos' | 'disponivel' | 'reservado'): void {
         this.statusFilter = status;
+        this.currentPage = 1;
         this.loadLivros();
     }
 
@@ -61,13 +71,14 @@ export class LivrosListComponent implements OnInit {
         this.loading = true;
         this.error = null;
 
-        this.livrosService.findAll(this.lastSearch).subscribe({
-            next: (livros) => {
-                if (this.statusFilter === 'todos') {
-                    this.livros = livros;
-                } else {
-                    this.livros = livros.filter(l => l.status === this.statusFilter);
+        this.livrosService.findAll(this.lastSearch, this.currentPage, this.pageSize).subscribe({
+            next: (response) => {
+                let items = response.items;
+                if (this.statusFilter !== 'todos') {
+                    items = items.filter(l => l.status === this.statusFilter);
                 }
+                this.livros = items;
+                this.totalItems = response.total;
                 this.loading = false;
             },
             error: (err) => {
@@ -77,6 +88,12 @@ export class LivrosListComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    changePage(page: number): void {
+        this.currentPage = page;
+        this.loadLivros();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     deleteLivro(livro: Livro): void {

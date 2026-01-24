@@ -13,10 +13,14 @@
     <div class="card-premium no-padding overflow-hidden">
         <div class="table-actions">
             <div class="filter-tabs">
-                <button class="tab" [class.active]="!showOnlyAtrasadas"
-                    (click)="showOnlyAtrasadas = false; loadReservas()">Todas</button>
-                <button class="tab" [class.active]="showOnlyAtrasadas"
-                    (click)="showOnlyAtrasadas = true; loadReservas()">Atrasadas</button>
+                <button class="tab" [class.active]="currentFilter === 'todas'"
+                    (click)="setFilter('todas')">Todas</button>
+                <button class="tab" [class.active]="currentFilter === 'ativa'"
+                    (click)="setFilter('ativa')">Ativas</button>
+                <button class="tab" [class.active]="currentFilter === 'atrasada'"
+                    (click)="setFilter('atrasada')">Atrasadas</button>
+                <button class="tab" [class.active]="currentFilter === 'concluida'"
+                    (click)="setFilter('concluida')">Concluídas</button>
             </div>
         </div>
 
@@ -24,7 +28,8 @@
 
         <div *ngIf="error" class="error-msg text-center p-4">{{ error }}</div>
 
-        <table *ngIf="!loading && !error" class="table-premium">
+        <!-- Desktop Table View -->
+        <table *ngIf="!loading && !error" class="table-premium hidden-mobile">
             <thead>
                 <tr>
                     <th>#</th>
@@ -81,8 +86,72 @@
             </tbody>
         </table>
 
+        <!-- Mobile Card View -->
+        <div *ngIf="!loading && !error" class="mobile-reserva-list hidden-desktop">
+            <div *ngFor="let reserva of reservas" class="reserva-mobile-card">
+                <div class="card-status-dot" [ngClass]="'status-' + reserva.status"></div>
+                <div class="reserva-header">
+                    <div class="book-info">
+                        <span class="book-title">{{ getLivroTitulo(reserva) }}</span>
+                        <span class="client-name">{{ getClienteNome(reserva) }}</span>
+                    </div>
+                    <span class="badge-premium" [ngClass]="'badge-' + reserva.status">
+                        {{ reserva.status === 'atrasada' ? 'Atrasada' : (reserva.status === 'ativa' ? 'Ativa' :
+                        'Concluída') }}
+                    </span>
+                </div>
+
+                <div class="reserva-details">
+                    <div class="detail-row">
+                        <lucide-icon [img]="CalendarIcon" [size]="14"></lucide-icon>
+                        <span>Reserva: {{ formatDate(reserva.dataReserva) }}</span>
+                    </div>
+                    <div class="detail-row" [class.overdue]="reserva.status === 'atrasada'">
+                        <lucide-icon [img]="ClockIcon" [size]="14"></lucide-icon>
+                        <span>Prevista: {{ formatDate(reserva.dataPrevistaDevolucao) }}</span>
+                    </div>
+                </div>
+
+                <div *ngIf="reserva.multa" class="mobile-multa-info">
+                    <span class="multa-label">MULTA ACUMULADA</span>
+                    <span class="multa-value">{{ formatCurrency(reserva.multa.valorTotal) }} ({{
+                        reserva.multa.diasAtraso }}d)</span>
+                </div>
+
+                <div class="reserva-actions">
+                    <button *ngIf="reserva.status !== 'concluida'" class="btn-premium btn-premium-primary full-width"
+                        (click)="devolver(reserva)">
+                        <lucide-icon [img]="CheckCircleIcon" [size]="18"></lucide-icon>
+                        Concluir Devolução
+                    </button>
+                    <button class="btn-premium btn-premium-secondary full-width" (click)="deleteReserva(reserva)">
+                        <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
+                        Excluir Registro
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div *ngIf="!loading && reservas.length === 0" class="empty-reservas">
             Nenhuma reserva encontrada.
         </div>
+        <!-- Pagination -->
+        <div *ngIf="!loading && !error && totalItems > 0" class="pagination-footer">
+            <div class="pagination-info">
+                Mostrando {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} de
+                {{ totalItems }} registros
+            </div>
+            <div class="pagination-actions">
+                <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="btn-page">
+                    <lucide-icon [img]="ChevronLeftIcon" [size]="18"></lucide-icon>
+                    Anterior
+                </button>
+                <span class="current-page">{{ currentPage }}</span>
+                <button [disabled]="currentPage * pageSize >= totalItems" (click)="changePage(currentPage + 1)"
+                    class="btn-page">
+                    Próximo
+                    <lucide-icon [img]="ChevronRightIcon" [size]="18"></lucide-icon>
+                </button>
+            </div>
+        </div>
     </div>
-</div>

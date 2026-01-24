@@ -8,6 +8,7 @@ import {
     Delete,
     HttpCode,
     HttpStatus,
+    Query,
 } from '@nestjs/common';
 import { ReservasService } from './reservas.service';
 import { CreateReservaDto, UpdateReservaDto } from './dto';
@@ -22,8 +23,12 @@ export class ReservasController {
     }
 
     @Get()
-    findAll() {
-        return this.reservasService.findAll();
+    findAll(
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('status') status?: string
+    ) {
+        return this.reservasService.findAll(+page, +limit, status);
     }
 
     @Get('atrasadas')

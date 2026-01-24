@@ -126,6 +126,125 @@
     text-align: right;
 }
 
+.mobile-client-list {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    .page-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 1rem;
+
+        h1 {
+            font-size: 1.5rem;
+            /* Reduced size for mobile */
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 0.875rem;
+        }
+
+        .btn-premium {
+            width: 100%;
+        }
+    }
+
+    .search-input-wrapper {
+        max-width: none;
+        margin: 0 1rem;
+    }
+
+    .search-bar {
+        padding: 1rem 0;
+        /* Align with input margin */
+    }
+
+    .mobile-client-list {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .client-mobile-card {
+        background: white;
+        border: 1px solid var(--color-slate-100);
+        border-radius: 16px;
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-slate-50);
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            .client-avatar {
+                width: 44px;
+                height: 44px;
+                background: var(--color-primary-50);
+                color: var(--color-primary-600);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 1.25rem;
+            }
+
+            .name-box {
+                display: flex;
+                flex-direction: column;
+
+                .client-name {
+                    font-weight: 700;
+                    color: var(--color-slate-800);
+                    font-size: 1rem;
+                }
+
+                .cpf-code {
+                    font-size: 0.75rem;
+                    color: var(--color-slate-400);
+                }
+            }
+        }
+
+        .card-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .contact-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.8125rem;
+                color: var(--color-slate-600);
+
+                lucide-icon {
+                    color: var(--color-slate-400);
+                }
+            }
+        }
+    }
+}
+
 .loading-state,
 .empty-state {
     padding: 5rem 2rem;

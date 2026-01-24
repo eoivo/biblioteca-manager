@@ -23,7 +23,8 @@
 
     <div *ngIf="error" class="error-msg text-center p-4">{{ error }}</div>
 
-    <table *ngIf="!loading && !error" class="table-premium">
+    <!-- Desktop Table View -->
+    <table *ngIf="!loading && !error" class="table-premium hidden-mobile">
       <thead>
         <tr>
           <th>Nome do Cliente</th>
@@ -64,6 +65,58 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Mobile Card View -->
+    <div *ngIf="!loading && !error" class="mobile-client-list hidden-desktop">
+      <div *ngFor="let cliente of clientes" class="client-mobile-card">
+        <div class="card-top">
+          <div class="client-info">
+            <div class="client-avatar">{{ cliente.nome.charAt(0) }}</div>
+            <div class="name-box">
+              <span class="client-name">{{ cliente.nome }}</span>
+              <span class="cpf-code">{{ formatCpf(cliente.cpf) }}</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <a [routerLink]="['/clientes', cliente._id, 'editar']" class="btn-icon-only text-blue-600">
+              <lucide-icon [img]="EditIcon" [size]="18"></lucide-icon>
+            </a>
+            <button class="btn-icon-only text-rose-500" (click)="deleteCliente(cliente)">
+              <lucide-icon [img]="Trash2Icon" [size]="18"></lucide-icon>
+            </button>
+          </div>
+        </div>
+        <div class="card-bottom">
+          <div class="contact-item">
+            <lucide-icon [img]="MailIcon" [size]="14"></lucide-icon>
+            <span>{{ cliente.email }}</span>
+          </div>
+          <div class="contact-item">
+            <lucide-icon [img]="PhoneIcon" [size]="14"></lucide-icon>
+            <span>{{ formatTelefone(cliente.telefone) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !error && totalItems > 0" class="pagination-footer">
+      <div class="pagination-info">
+        Mostrando {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} de {{
+        totalItems }} registros
+      </div>
+      <div class="pagination-actions">
+        <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="btn-page">
+          <lucide-icon [img]="ChevronLeftIcon" [size]="18"></lucide-icon>
+          Anterior
+        </button>
+        <span class="current-page">{{ currentPage }}</span>
+        <button [disabled]="currentPage * pageSize >= totalItems" (click)="changePage(currentPage + 1)"
+          class="btn-page">
+          Próximo
+          <lucide-icon [img]="ChevronRightIcon" [size]="18"></lucide-icon>
+        </button>
+      </div>
+    </div>
 
     <div *ngIf="!loading && clientes.length === 0" class="empty-state">
       <lucide-icon [img]="UserIcon" [size]="64" strokeWidth="1"></lucide-icon>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { LucideAngularModule, User, Plus, Edit, Trash2, Search } from 'lucide-angular';
+import { LucideAngularModule, User, Plus, Edit, Trash2, Search, Mail, Phone, ChevronLeft, ChevronRight } from 'lucide-angular';
 import { ClientesService, NotificationService } from '../../core/services';
 import { Cliente } from '../../core/models';
 import { formatCpf, formatTelefone } from '../../shared/validators/cpf.validator';
@@ -19,6 +19,12 @@ export class ClientesListComponent implements OnInit {
     loading = true;
     error: string | null = null;
     private searchSubject = new Subject<string>();
+    protected readonly Math = Math;
+
+    // Pagination
+    currentPage = 1;
+    pageSize = 10;
+    totalItems = 0;
 
     // Icons
     readonly UserIcon = User;
@@ -26,6 +32,10 @@ export class ClientesListComponent implements OnInit {
     readonly EditIcon = Edit;
     readonly Trash2Icon = Trash2;
     readonly SearchIcon = Search;
+    readonly MailIcon = Mail;
+    readonly PhoneIcon = Phone;
+    readonly ChevronLeftIcon = ChevronLeft;
+    readonly ChevronRightIcon = ChevronRight;
 
     constructor(
         private clientesService: ClientesService,
@@ -40,6 +50,7 @@ export class ClientesListComponent implements OnInit {
             debounceTime(400),
             distinctUntilChanged()
         ).subscribe(searchTerm => {
+            this.currentPage = 1; // Reset to page 1 on search
             this.loadClientes(searchTerm);
         });
     }
@@ -53,9 +64,10 @@ export class ClientesListComponent implements OnInit {
         this.loading = true;
         this.error = null;
 
-        this.clientesService.findAll(search).subscribe({
-            next: (clientes) => {
-                this.clientes = clientes;
+        this.clientesService.findAll(search, this.currentPage, this.pageSize).subscribe({
+            next: (response) => {
+                this.clientes = response.items;
+                this.totalItems = response.total;
                 this.loading = false;
             },
             error: (err) => {
@@ -65,6 +77,12 @@ export class ClientesListComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    changePage(page: number): void {
+        this.currentPage = page;
+        this.loadClientes();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     deleteCliente(cliente: Cliente): void {

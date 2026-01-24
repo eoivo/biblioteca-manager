@@ -164,6 +164,184 @@
     text-align: right;
 }
 
+.mobile-reserva-list {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none !important;
+    }
+
+    .page-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 1rem;
+
+        h1 {
+            font-size: 1.5rem;
+            /* Better for mobile */
+            line-height: 1.2;
+        }
+
+        p {
+            font-size: 0.8125rem;
+        }
+
+        .btn-premium {
+            width: 100%;
+        }
+    }
+
+    .table-actions {
+        overflow-x: auto;
+        padding: 1rem;
+
+        .filter-tabs {
+            width: 100%;
+            display: flex;
+
+            .tab {
+                flex: 1;
+                white-space: nowrap;
+                padding: 0.5rem 0.75rem;
+            }
+        }
+    }
+
+    .mobile-reserva-list {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 1.25rem;
+    }
+
+    .reserva-mobile-card {
+        background: white;
+        border: 1px solid var(--color-slate-100);
+        border-radius: 20px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+
+        .card-status-dot {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+
+            &.status-atrasada {
+                background: var(--color-rose-500);
+            }
+
+            &.status-ativa {
+                background: var(--color-primary-500);
+            }
+
+            &.status-concluida {
+                background: var(--color-emerald-500);
+            }
+        }
+
+        .reserva-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+
+            .book-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+
+                .book-title {
+                    font-weight: 800;
+                    color: var(--color-slate-800);
+                    font-size: 1.125rem;
+                    line-height: 1.3;
+                }
+
+                .client-name {
+                    font-size: 0.8125rem;
+                    color: var(--color-slate-500);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .reserva-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--color-slate-50);
+            border-radius: 12px;
+
+            .detail-row {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-size: 0.8125rem;
+                color: var(--color-slate-600);
+                font-weight: 500;
+
+                lucide-icon {
+                    color: var(--color-slate-400);
+                }
+
+                &.overdue {
+                    color: var(--color-rose-600);
+                    font-weight: 700;
+
+                    lucide-icon {
+                        color: var(--color-rose-500);
+                    }
+                }
+            }
+        }
+
+        .mobile-multa-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--color-rose-50);
+            border: 1px dashed var(--color-rose-200);
+            border-radius: 12px;
+
+            .multa-label {
+                font-size: 0.625rem;
+                font-weight: 800;
+                color: var(--color-rose-400);
+                letter-spacing: 0.1em;
+            }
+
+            .multa-value {
+                font-size: 1rem;
+                font-weight: 800;
+                color: var(--color-rose-600);
+            }
+        }
+
+        .reserva-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+
+            .full-width {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+}
+
 .loading-state,
 .empty-reservas {
     padding: 4rem;

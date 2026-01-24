@@ -20,6 +20,7 @@ export class App {
   title = 'BiblioManager';
   showUserDropdown = false;
   sidebarCollapsed = false;
+  showMobileMenu = false;
 
   readonly DashboardIcon = LayoutDashboard;
   readonly UserIcon = User;
@@ -35,8 +36,20 @@ export class App {
   isLoggedIn$ = this.authService.isLoggedIn();
   currentUser$ = this.authService.user$;
 
+  constructor() {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.showMobileMenu = false;
+    });
+  }
+
   toggleSidebar() {
     this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  toggleMobileMenu() {
+    this.showMobileMenu = !this.showMobileMenu;
   }
 
   toggleUserDropdown(event: Event) {

@@ -79,4 +79,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && !error && totalItems > 0" class="pagination-footer mt-6">
+        <div class="pagination-info">
+            Mostrando {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} de {{
+            totalItems }} registros
+        </div>
+        <div class="pagination-actions">
+            <button [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)" class="btn-page">
+                <lucide-icon [img]="ChevronLeftIcon" [size]="18"></lucide-icon>
+                Anterior
+            </button>
+            <span class="current-page">{{ currentPage }}</span>
+            <button [disabled]="currentPage * pageSize >= totalItems" (click)="changePage(currentPage + 1)"
+                class="btn-page">
+                Próximo
+                <lucide-icon [img]="ChevronRightIcon" [size]="18"></lucide-icon>
+            </button>
+        </div>
+    </div>
 </div>

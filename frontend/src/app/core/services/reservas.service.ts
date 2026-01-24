@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Reserva, CreateReservaDto } from '../models/reserva.model';
+import { Reserva, CreateReservaDto, PaginatedResponse } from '../models';
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +13,11 @@ export class ReservasService {
 
     constructor(private http: HttpClient) { }
 
-    findAll(): Observable<Reserva[]> {
-        return this.http.get<Reserva[]>(this.apiUrl).pipe(
+    findAll(page: number = 1, limit: number = 10, status?: string): Observable<PaginatedResponse<Reserva>> {
+        const params: any = { page, limit };
+        if (status) params.status = status;
+
+        return this.http.get<PaginatedResponse<Reserva>>(this.apiUrl, { params }).pipe(
             catchError(this.handleError)
         );
     }

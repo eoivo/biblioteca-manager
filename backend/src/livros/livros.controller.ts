@@ -23,8 +23,12 @@ export class LivrosController {
     }
 
     @Get()
-    findAll(@Query('q') q?: string) {
-        return this.livrosService.findAll(q);
+    findAll(
+        @Query('q') q?: string,
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10
+    ) {
+        return this.livrosService.findAll(q, +page, +limit);
     }
 
     @Get('disponiveis')

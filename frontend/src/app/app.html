@@ -1,8 +1,11 @@
 <app-notification></app-notification>
 <div *ngIf="isLoggedIn$ | async as isLoggedIn; else loginView" class="app-container"
   [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Sidebar Overlay (Backdrop) -->
+  <div *ngIf="showMobileMenu" class="sidebar-overlay" (click)="toggleMobileMenu()"></div>
+
   <!-- Sidebar -->
-  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed" [class.show-mobile]="showMobileMenu">
     <div class="sidebar-header" [class.collapsed-header]="sidebarCollapsed">
       <div class="logo" (click)="sidebarCollapsed ? toggleSidebar() : null" [class.clickable]="sidebarCollapsed"
         [title]="sidebarCollapsed ? 'Expandir Menu' : ''">
@@ -42,8 +45,13 @@
     <!-- Top Header -->
     <header class="top-header">
       <div class="header-left">
-        <span class="area-tag">Área Administrativa</span>
-        <h2 class="view-title">Módulo: {{ getModuleTitle(currentRoute$ | async) }}</h2>
+        <button class="btn-mobile-menu" (click)="toggleMobileMenu()">
+          <lucide-icon [img]="MenuIcon" [size]="24"></lucide-icon>
+        </button>
+        <div class="header-titles">
+          <span class="area-tag">Área Administrativa</span>
+          <h2 class="view-title">Módulo: {{ getModuleTitle(currentRoute$ | async) }}</h2>
+        </div>
       </div>
       <div class="header-right">
         <!-- Notification Icon Removed -->
