@@ -66,7 +66,7 @@ export class DashboardComponent implements OnInit {
   constructor(
     private clientesService: ClientesService,
     private livrosService: LivrosService,
-    private reservasService: ReservasService
+    private reservasService: ReservasService,
   ) {}
 
   ngOnInit() {
@@ -87,12 +87,12 @@ export class DashboardComponent implements OnInit {
 
         this.stats.availableBooks = available;
         this.stats.activeReservations = reservations.items.filter(
-          (r) => r.status === 'ativa'
+          (r) => r.status === 'ativa',
         ).length;
         this.stats.overdueCount = reservations.items.filter((r) => r.status === 'atrasada').length;
         this.stats.totalFines = reservations.items.reduce(
           (acc, curr) => acc + (curr.multa?.valorTotal || 0),
-          0
+          0,
         );
 
         // Dados para o gráfico de Rosca (Livros)
@@ -120,6 +120,18 @@ export class DashboardComponent implements OnInit {
 
   formatCurrency(value: number): string {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  gerarRelatorio() {
+    // Gerar relatório do último mês
+    const hoje = new Date();
+    const mesPassado = new Date();
+    mesPassado.setMonth(mesPassado.getMonth() - 1);
+
+    const dataInicio = mesPassado.toISOString().split('T')[0];
+    const dataFim = hoje.toISOString().split('T')[0];
+
+    this.reservasService.gerarRelatorioCaixa(dataInicio, dataFim);
   }
 
   getClienteNome(reserva: Reserva): string {

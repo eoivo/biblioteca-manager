@@ -9,7 +9,9 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -93,6 +95,36 @@ export class ReservasController {
   @ApiResponse({ status: 200, description: 'Lista de reservas do cliente' })
   findByCliente(@Param('id') id: string) {
     return this.reservasService.findByCliente(id);
+  }
+
+  @Get('relatorio-caixa')
+  @ApiOperation({
+    summary: 'Gerar relatório de caixa',
+    description: 'Exporta relatório CSV com reservas e multas do período',
+  })
+  @ApiQuery({
+    name: 'inicio',
+    required: false,
+    description: 'Data inicial (YYYY-MM-DD)',
+  })
+  @ApiQuery({
+    name: 'fim',
+    required: false,
+    description: 'Data final (YYYY-MM-DD)',
+  })
+  @ApiResponse({ status: 200, description: 'Relatório CSV gerado' })
+  async gerarRelatorioCaixa(
+    @Res() res: Response,
+    @Query('inicio') inicio?: string,
+    @Query('fim') fim?: string,
+  ) {
+    const csv = await this.reservasService.gerarRelatorioCaixa(inicio, fim);
+
+    const filename = `relatorio-caixa-${new Date().toISOString().split('T')[0]}.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send('\uFEFF' + csv); // BOM para UTF-8
   }
 
   @Get(':id')
