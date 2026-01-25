@@ -82,10 +82,19 @@ export class ReservaFormComponent implements OnInit {
                 value: c._id
             }));
 
-            this.livroOptions = this.livrosDisponiveis.map(l => ({
-                label: `${l.titulo} - ${l.autor}`,
-                value: l._id
-            }));
+            this.livroOptions = this.livrosDisponiveis.map(l => {
+                const parts = [l.titulo, l.autor];
+                if (l.editora) parts.push(l.editora);
+
+                let label = parts.join(' | ');
+                if (l.anoPublicacao) label += ` (${l.anoPublicacao})`;
+                if (l.isbn) label += ` [ISBN: ${l.isbn}]`;
+
+                return {
+                    label: label,
+                    value: l._id
+                };
+            });
 
             this.loading = false;
         }).catch(err => {

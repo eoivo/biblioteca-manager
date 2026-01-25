@@ -51,7 +51,7 @@
                     </td>
                     <td>
                         <div class="reserva-dates">
-                            <span class="date-row">Reserva: {{ formatDate(reserva.dataReserva) }}</span>
+                            <span class="date-row">Reserva: {{ formatDateLocal(reserva.dataReserva) }}</span>
                             <span class="date-row highlight" [class.overdue]="reserva.status === 'atrasada'">
                                 Prevista: {{ formatDate(reserva.dataPrevistaDevolucao) }}
                             </span>
@@ -105,7 +105,7 @@
                 <div class="reserva-details">
                     <div class="detail-row">
                         <lucide-icon [img]="CalendarIcon" [size]="14"></lucide-icon>
-                        <span>Reserva: {{ formatDate(reserva.dataReserva) }}</span>
+                        <span>Reserva: {{ formatDateLocal(reserva.dataReserva) }}</span>
                     </div>
                     <div class="detail-row" [class.overdue]="reserva.status === 'atrasada'">
                         <lucide-icon [img]="ClockIcon" [size]="14"></lucide-icon>

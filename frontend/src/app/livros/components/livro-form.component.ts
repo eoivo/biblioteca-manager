@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { LucideAngularModule, Book, Save, X, ArrowLeft } from 'lucide-angular';
+import { LucideAngularModule, Book, Save, X, ArrowLeft, Search, Loader2, Trash2 } from 'lucide-angular';
+import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
 import { LivrosService, NotificationService } from '../../core/services';
+import { OpenLibraryService, OpenLibraryBook } from '../../core/services/open-library';
 import { CustomSelectComponent, SelectOption } from '../../shared/components/custom-select/custom-select.component';
 
 @Component({
@@ -19,19 +21,31 @@ export class LivroFormComponent implements OnInit {
     livroId: string | null = null;
     loading = false;
     submitting = false;
+    searchingIsbn = false;
     error: string | null = null;
+
+    // Autocomplete
+    suggestions: OpenLibraryBook[] = [];
+    showSuggestions = false;
+    searchingTitle = false;
 
     readonly BookIcon = Book;
     readonly SaveIcon = Save;
     readonly XIcon = X;
     readonly ArrowLeftIcon = ArrowLeft;
+    readonly SearchIcon = Search;
+    readonly LoaderIcon = Loader2;
+    readonly TrashIcon = Trash2;
 
     categorias: string[] = [
         'Literatura Brasileira',
         'Literatura Estrangeira',
         'Ficção Científica',
         'Fantasia',
+        'Romance',
         'Suspense/Policial',
+        'Terror',
+        'Tecnologia',
         'Autoajuda',
         'Didáticos',
         'Biografia',
@@ -46,6 +60,7 @@ export class LivroFormComponent implements OnInit {
     constructor(
         private fb: FormBuilder,
         private livrosService: LivrosService,
+        private openLibraryService: OpenLibraryService,
         private router: Router,
         private route: ActivatedRoute,
         private notificationService: NotificationService
@@ -53,6 +68,7 @@ export class LivroFormComponent implements OnInit {
 
     ngOnInit(): void {
         this.initForm();
+        this.setupAutocomplete();
 
         this.livroId = this.route.snapshot.paramMap.get('id');
         if (this.livroId) {
@@ -74,6 +90,61 @@ export class LivroFormComponent implements OnInit {
         });
     }
 
+    private setupAutocomplete(): void {
+        this.form.get('titulo')?.valueChanges.pipe(
+            debounceTime(500),
+            distinctUntilChanged(),
+            filter(value => {
+                if (!value || value.length < 3) {
+                    this.suggestions = [];
+                    this.showSuggestions = false;
+                    return false;
+                }
+                return true;
+            }),
+            switchMap(value => {
+                this.searchingTitle = true;
+                return this.openLibraryService.searchBooksByTitle(value);
+            })
+        ).subscribe({
+            next: (books) => {
+                this.searchingTitle = false;
+                this.suggestions = books;
+                this.showSuggestions = books.length > 0;
+            },
+            error: () => {
+                this.searchingTitle = false;
+                this.suggestions = [];
+            }
+        });
+    }
+
+    selectSuggestion(book: OpenLibraryBook): void {
+        this.suggestions = [];
+        this.showSuggestions = false;
+
+        this.form.patchValue({
+            titulo: book.titulo,
+            autor: book.autor,
+            editora: book.editora,
+            anoPublicacao: book.ano,
+            isbn: book.isbn
+        }, { emitEvent: false });
+    }
+
+    onBlurTitle(): void {
+        // Delay to allow click event on suggestion to fire
+        setTimeout(() => {
+            this.showSuggestions = false;
+        }, 200);
+    }
+
+    onFocusTitle(): void {
+        if (this.suggestions.length > 0) {
+            this.showSuggestions = true;
+        }
+    }
+
     onCategoriaChange() {
         const categoria = this.form.get('categoria')?.value;
         this.mostrarOutraCategoria = categoria === 'Outro';
@@ -84,6 +155,44 @@ export class LivroFormComponent implements OnInit {
             this.form.get('outraCategoria')?.setValue('');
         }
         this.form.get('outraCategoria')?.updateValueAndValidity();
+    }
+
+    searchByIsbn(): void {
+        const isbn = this.form.get('isbn')?.value;
+        if (!isbn || isbn.trim().length < 10) {
+            this.notificationService.warning('Digite um ISBN válido para buscar (min 10 caracteres).');
+            return;
+        }
+
+        this.searchingIsbn = true;
+        this.openLibraryService.getBookByIsbn(isbn).subscribe({
+            next: (book) => {
+                this.searchingIsbn = false;
+                if (book) {
+                    this.form.patchValue({
+                        titulo: book.titulo,
+                        autor: book.autor,
+                        editora: book.editora,
+                        anoPublicacao: book.ano
+                    }, { emitEvent: false });
+                    this.notificationService.success('Dados do livro encontrados!', 'Sucesso');
+                } else {
+                    this.notificationService.info('Livro não encontrado na base externa.', 'Não encontrado');
+                }
+            },
+            error: () => {
+                this.searchingIsbn = false;
+                this.notificationService.error('Erro ao buscar dados na Open Library.');
+            }
+        });
+    }
+
+    clearForm(): void {
+        this.form.reset();
+        this.suggestions = [];
+        this.showSuggestions = false;
+        this.mostrarOutraCategoria = false;
+        this.error = null;
     }
 
     private loadLivro(id: string): void {

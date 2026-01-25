@@ -174,6 +174,12 @@ export class ReservasListComponent implements OnInit {
     }
 
     formatDate(date: Date | string): string {
+        if (!date) return '-';
+        return new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    }
+
+    formatDateLocal(date: Date | string): string {
+        if (!date) return '-';
         return new Date(date).toLocaleDateString('pt-BR');
     }
 

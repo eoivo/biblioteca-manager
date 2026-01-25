@@ -61,7 +61,15 @@ export class ReservasService {
   ): Promise<{ items: any[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
     const query: any = {};
-    if (status) {
+
+    if (status === 'atrasada') {
+      // RN005: Atrasadas são Ativas com data vencida
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      query.status = ReservaStatus.ATIVA;
+      query.dataPrevistaDevolucao = { $lt: hoje };
+    } else if (status) {
       query.status = status;
     }
 

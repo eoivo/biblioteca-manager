@@ -224,6 +224,39 @@
             }
         }
 
+        .system-clock {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-right: 0.5rem;
+            padding-right: 1.5rem;
+            border-right: 1px solid var(--color-slate-200);
+            color: var(--color-slate-600);
+            font-size: 0.8125rem;
+            font-weight: 500;
+            user-select: none;
+
+            .clock-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .clock-icon {
+                color: var(--color-slate-400);
+                transform: translateY(1px);
+                /* Visual correction */
+            }
+
+            .time-separator {
+                color: var(--color-slate-300);
+            }
+
+            @media (max-width: 768px) {
+                display: none;
+            }
+        }
+
         .user-menu-container {
             position: relative;
         }

@@ -56,6 +56,13 @@
       <div class="header-right">
         <!-- Notification Icon Removed -->
 
+        <div class="system-clock hidden-mobile">
+          <div class="clock-item">
+            <lucide-icon [img]="CalendarIcon" [size]="16" class="clock-icon"></lucide-icon>
+            <span class="date-display">{{ currentDateTime | date:"d 'de' MMM 'de' y" }}</span>
+          </div>
+        </div>
+
         <div *ngIf="currentUser$ | async as user" class="user-menu-container">
           <button class="user-profile-btn" (click)="toggleUserDropdown($event)">
             <div class="user-avatar">{{ user.nome.charAt(0) }}</div>

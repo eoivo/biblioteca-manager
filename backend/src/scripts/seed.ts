@@ -116,7 +116,7 @@ async function bootstrap() {
             livroId: (livro as any)._id,
             dataReserva,
             dataPrevistaDevolucao: dataPrevista,
-            status: ReservaStatus.ATRASADA
+            status: ReservaStatus.ATIVA
         });
 
         await livroModel.findByIdAndUpdate((livro as any)._id, { status: LivroStatus.RESERVADO });

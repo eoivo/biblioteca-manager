@@ -4,10 +4,17 @@
             <h1 class="title-font">{{ isEdit ? 'Editar Livro' : 'Novo Livro' }}</h1>
             <p>Gerencie as informações da obra em seu acervo.</p>
         </div>
-        <a routerLink="/livros" class="btn-premium btn-premium-secondary">
-            <lucide-icon [img]="ArrowLeftIcon" [size]="18"></lucide-icon>
-            Voltar
-        </a>
+        <div class="actions-group">
+            <button *ngIf="form.dirty || (form.value.titulo || form.value.isbn)" (click)="clearForm()"
+                class="btn-premium btn-premium-ghost" type="button">
+                <lucide-icon [img]="TrashIcon" [size]="18"></lucide-icon>
+                Limpar
+            </button>
+            <a routerLink="/livros" class="btn-premium btn-premium-secondary">
+                <lucide-icon [img]="ArrowLeftIcon" [size]="18"></lucide-icon>
+                Voltar
+            </a>
+        </div>
     </div>
 
     <div class="card-premium">
