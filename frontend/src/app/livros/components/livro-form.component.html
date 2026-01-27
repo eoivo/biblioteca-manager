@@ -27,8 +27,29 @@
                 <div class="form-row">
                     <div class="form-group flex-2">
                         <label for="titulo">Título do Livro <span class="required-mark">*</span></label>
-                        <input type="text" id="titulo" formControlName="titulo" class="input-premium"
-                            [class.error]="isFieldInvalid('titulo')" placeholder="Ex: Clean Code">
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="titulo" formControlName="titulo" class="input-premium"
+                                [class.error]="isFieldInvalid('titulo')" placeholder="Ex: Clean Code"
+                                (blur)="onBlurTitle()" (focus)="onFocusTitle()" autocomplete="off">
+
+                            <div *ngIf="searchingTitle" class="input-loader">
+                                <lucide-icon [img]="LoaderIcon" [size]="16" class="spin-anim"></lucide-icon>
+                            </div>
+
+                            <ul class="suggestions-list" *ngIf="showSuggestions">
+                                <li *ngFor="let book of suggestions" (click)="selectSuggestion(book)">
+                                    <div class="suggestion-icon">
+                                        <img *ngIf="book.coverUrl" [src]="book.coverUrl" alt="Capa">
+                                        <lucide-icon *ngIf="!book.coverUrl" [img]="BookIcon" [size]="20"></lucide-icon>
+                                    </div>
+                                    <div class="suggestion-info">
+                                        <span class="sug-title">{{ book.titulo }}</span>
+                                        <span class="sug-meta">{{ book.autor }} <span *ngIf="book.ano">• {{ book.ano
+                                                }}</span></span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                         <span class="error-msg" *ngIf="isFieldInvalid('titulo')">{{ getFieldError('titulo') }}</span>
                     </div>
 
@@ -43,8 +64,16 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="isbn">ISBN</label>
-                        <input type="text" id="isbn" formControlName="isbn" class="input-premium"
-                            placeholder="978-0132350884">
+                        <div class="input-action-group">
+                            <input type="text" id="isbn" formControlName="isbn" class="input-premium"
+                                placeholder="978-0132350884">
+                            <button type="button" class="btn-input-action" (click)="searchByIsbn()"
+                                [disabled]="searchingIsbn" title="Buscar dados na Open Library">
+                                <lucide-icon *ngIf="!searchingIsbn" [img]="SearchIcon" [size]="18"></lucide-icon>
+                                <lucide-icon *ngIf="searchingIsbn" [img]="LoaderIcon" [size]="18"
+                                    class="spin-anim"></lucide-icon>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">

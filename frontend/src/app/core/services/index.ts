@@ -4,3 +4,4 @@ export * from './reservas.service';
 export * from './auth.service';
 export * from './notification.service';
 export * from './cep.service';
+export * from './open-library';
