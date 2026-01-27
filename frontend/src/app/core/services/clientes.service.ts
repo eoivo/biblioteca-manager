@@ -72,33 +72,10 @@ export class ClientesService {
 
     /**
      * Tratamento de erros HTTP
+     * Preserva o HttpErrorResponse para que os componentes possam acessar status, message, etc.
      */
     private handleError(error: HttpErrorResponse) {
-        let errorMessage = 'Ocorreu um erro desconhecido';
-
-        if (error.error instanceof ErrorEvent) {
-            // Erro do lado do cliente
-            errorMessage = error.error.message;
-        } else {
-            // Erro do lado do servidor
-            switch (error.status) {
-                case 400:
-                    errorMessage = error.error?.message || 'Dados inválidos';
-                    break;
-                case 404:
-                    errorMessage = 'Registro não encontrado';
-                    break;
-                case 409:
-                    errorMessage = error.error?.message || 'CPF já cadastrado';
-                    break;
-                case 500:
-                    errorMessage = 'Erro interno do servidor';
-                    break;
-                default:
-                    errorMessage = error.error?.message || 'Erro ao processar requisição';
-            }
-        }
-
-        return throwError(() => new Error(errorMessage));
+        // Retornar o erro HTTP original para permitir tratamento específico nos componentes
+        return throwError(() => error);
     }
 }

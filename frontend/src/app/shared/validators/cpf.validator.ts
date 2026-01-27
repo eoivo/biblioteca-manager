@@ -88,3 +88,63 @@ export function cpfValidator(): ValidatorFn {
     return isValidCpf(control.value) ? null : { cpfInvalido: true };
   };
 }
+
+/**
+ * Validador de data de nascimento
+ * Verifica se a data é válida, se não é no futuro e se atende a idade mínima
+ */
+export function birthDateValidator(minAge: number = 0): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (!control.value) {
+      return null;
+    }
+
+    const birthDate = new Date(control.value);
+
+    // Bug fix: When creating from 'YYYY-MM-DD' string, it might be interpreted as UTC
+    // Depending on the local time, it might shift a day.
+    // For birthday, we usually want the exact date.
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (isNaN(birthDate.getTime())) {
+      return { dataInvalida: true };
+    }
+
+    // Se a data for no futuro (comparando apenas datas, sem hora)
+    const birthDateOnly = new Date(birthDate.getTime());
+    if (typeof control.value === 'string' && control.value.includes('-')) {
+      // Se for string ISO YYYY-MM-DD, ajusta para meia-noite local para comparação justa
+      const parts = control.value.split('-');
+      birthDateOnly.setFullYear(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      birthDateOnly.setHours(0, 0, 0, 0);
+    }
+
+    if (birthDateOnly > today) {
+      return { dataFutura: true };
+    }
+
+    // Calcula idade
+    let age = today.getFullYear() - birthDateOnly.getFullYear();
+    const m = today.getMonth() - birthDateOnly.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDateOnly.getDate())) {
+      age--;
+    }
+
+    if (age < minAge) {
+      return { idadeMinima: { requiredAge: minAge, actualAge: age } };
+    }
+
+    return null;
+  };
+}
+
+/**
+ * Formata CEP para exibição: 00000-000
+ */
+export function formatCep(cep: string): string {
+  const clean = cep.replace(/\D/g, '');
+  if (clean.length !== 8) return cep;
+  return clean.replace(/(\d{5})(\d{3})/, '$1-$2');
+}

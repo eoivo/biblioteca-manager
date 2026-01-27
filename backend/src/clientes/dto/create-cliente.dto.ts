@@ -6,6 +6,7 @@ import {
   MaxLength,
   Length,
   ValidateNested,
+  IsDateString,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -96,6 +97,6 @@ export class CreateClienteDto {
     description: 'Data de nascimento do cliente (formato YYYY-MM-DD)',
   })
   @IsOptional()
-  @IsString()
+  @IsDateString({}, { message: 'Data de nascimento deve estar no formato YYYY-MM-DD' })
   dataNascimento?: string;
 }

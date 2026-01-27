@@ -11,6 +11,7 @@ import {
   formatCpf,
   formatTelefone,
   cpfValidator,
+  birthDateValidator,
 } from '../../shared/validators/cpf.validator';
 import { CalendarComponent } from '../../shared/components/calendar/calendar.component';
 
@@ -77,7 +78,7 @@ export class ClienteFormComponent implements OnInit {
       ],
       email: ['', [Validators.required, Validators.email]],
       telefone: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(15)]],
-      dataNascimento: [null],
+      dataNascimento: [null, [birthDateValidator(10)]],
       endereco: this.fb.group({
         cep: ['', [Validators.required, Validators.maxLength(9)]],
         rua: ['', [Validators.required]],
@@ -144,13 +145,13 @@ export class ClienteFormComponent implements OnInit {
             : null,
           endereco: cliente.endereco
             ? {
-                ...cliente.endereco,
-                cep: cliente.endereco.cep
-                  ? cliente.endereco.cep.length === 8
-                    ? cliente.endereco.cep.substring(0, 5) + '-' + cliente.endereco.cep.substring(5)
-                    : cliente.endereco.cep
-                  : '',
-              }
+              ...cliente.endereco,
+              cep: cliente.endereco.cep
+                ? cliente.endereco.cep.length === 8
+                  ? cliente.endereco.cep.substring(0, 5) + '-' + cliente.endereco.cep.substring(5)
+                  : cliente.endereco.cep
+                : '',
+            }
             : undefined,
         };
         this.form.patchValue(formattedCliente);
@@ -204,10 +205,20 @@ export class ClienteFormComponent implements OnInit {
         this.router.navigate(['/clientes']);
       },
       error: (err) => {
+        this.submitting = false;
+
+        // Detectar erro de CPF duplicado (status 409 - Conflict)
+        if (err.status === 409) {
+          this.form.get('cpf')?.setErrors({ cpfDuplicado: true });
+          this.form.get('cpf')?.markAsTouched();
+          this.notificationService.error('Este CPF já está cadastrado no sistema', 'CPF Duplicado');
+          this.error = 'CPF já cadastrado';
+          return;
+        }
+
         const msg = err.error?.message || 'Erro ao salvar cliente';
         this.notificationService.error(msg);
         this.error = msg;
-        this.submitting = false;
       },
     });
   }
@@ -242,11 +253,15 @@ export class ClienteFormComponent implements OnInit {
 
     if (control.errors['required']) return 'Campo obrigatório';
     if (control.errors['cpfInvalido']) return 'CPF inválido';
+    if (control.errors['cpfDuplicado']) return 'CPF já cadastrado no sistema';
     if (control.errors['minlength'])
       return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
     if (control.errors['maxlength'])
       return `Máximo ${control.errors['maxlength'].requiredLength} caracteres`;
     if (control.errors['email']) return 'Email inválido';
+    if (control.errors['dataFutura']) return 'Data não pode ser no futuro';
+    if (control.errors['idadeMinima']) return `Idade mínima de ${control.errors['idadeMinima'].requiredAge} anos`;
+    if (control.errors['dataInvalida']) return 'Data inválida';
 
     return 'Valor inválido';
   }

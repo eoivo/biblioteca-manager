@@ -282,16 +282,10 @@ export class CalendarComponent implements ControlValueAccessor {
             const y = parseInt(cleaned.substring(4, 8));
             const date = new Date(y, m, d);
             if (!isNaN(date.getTime())) {
-                // Verificar limites ao digitar
-                const isBeforeMin = this.minDate ? date < this.minDate : false;
-                const isAfterMax = this.maxDate ? date > this.maxDate : false;
-
-                if (!isBeforeMin && !isAfterMax) {
-                    this.selectedDate = date;
-                    this.viewDate = new Date(date);
-                    this.onChange(this.toIsoDate(date));
-                    this.generateCalendar();
-                }
+                this.selectedDate = date;
+                this.viewDate = new Date(date);
+                this.onChange(this.toIsoDate(date));
+                this.generateCalendar();
             }
         }
     }
