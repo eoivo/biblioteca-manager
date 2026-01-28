@@ -23,7 +23,7 @@ describe('LivrosService', () => {
     countDocuments: jest.fn(),
   };
 
-  const MockModel = jest.fn().mockImplementation((data) => ({
+  const MockModel: any = jest.fn().mockImplementation((data) => ({
     ...data,
     save: jest.fn().mockResolvedValue({ ...mockLivro, ...data }),
   }));
@@ -68,6 +68,7 @@ describe('LivrosService', () => {
   describe('findAll', () => {
     it('deve retornar array de livros', async () => {
       const mockChain = {
+        sort: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([mockLivro]),

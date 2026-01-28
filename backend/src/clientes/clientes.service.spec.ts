@@ -32,7 +32,7 @@ describe('ClientesService', () => {
     };
 
     // Mock para new this.clienteModel()
-    const MockModel = jest.fn().mockImplementation((data) => ({
+    const MockModel: any = jest.fn().mockImplementation((data) => ({
       ...data,
       save: jest.fn().mockResolvedValue({ ...mockCliente, ...data }),
     }));
@@ -113,6 +113,7 @@ describe('ClientesService', () => {
   describe('findAll', () => {
     it('deve retornar array de clientes', async () => {
       const mockChain = {
+        sort: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue([mockCliente]),
