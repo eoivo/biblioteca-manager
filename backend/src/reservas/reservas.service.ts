@@ -208,12 +208,17 @@ export class ReservasService {
    */
   private calcularMultaSeAtrasada(reserva: any): any {
     const reservaObj = reserva.toObject ? reserva.toObject() : reserva;
-    const hoje = new Date();
-    const dataPrevista = new Date(reservaObj.dataPrevistaDevolucao);
 
-    // Zerar horas para comparar apenas datas
-    hoje.setHours(0, 0, 0, 0);
-    dataPrevista.setHours(0, 0, 0, 0);
+    // Usar UTC para evitar problemas de fuso horário
+    const agora = new Date();
+    const hojeUTC = Date.UTC(agora.getFullYear(), agora.getMonth(), agora.getDate());
+
+    const dataPrevistaOriginal = new Date(reservaObj.dataPrevistaDevolucao);
+    const dataPrevistaUTC = Date.UTC(
+      dataPrevistaOriginal.getUTCFullYear(),
+      dataPrevistaOriginal.getUTCMonth(),
+      dataPrevistaOriginal.getUTCDate()
+    );
 
     // Se já está concluída, retornar como está
     if (reservaObj.status === ReservaStatus.CONCLUIDA) {
@@ -221,9 +226,10 @@ export class ReservasService {
     }
 
     // RN005: Verificar se está atrasada
-    if (hoje > dataPrevista) {
-      const diffTime = hoje.getTime() - dataPrevista.getTime();
-      const diasAtraso = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (hojeUTC > dataPrevistaUTC) {
+      const diffTime = hojeUTC - dataPrevistaUTC;
+      // Usar Math.floor para contar apenas dias completos de atraso
+      const diasAtraso = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
       // RN004: Calcular multa
       // Multa = ValorFixo + (ValorFixo × 0,05 × DiasAtraso)

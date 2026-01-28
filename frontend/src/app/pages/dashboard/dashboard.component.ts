@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit {
     private clientesService: ClientesService,
     private livrosService: LivrosService,
     private reservasService: ReservasService,
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadDashboardData();
@@ -90,10 +90,10 @@ export class DashboardComponent implements OnInit {
           (r) => r.status === 'ativa',
         ).length;
         this.stats.overdueCount = reservations.items.filter((r) => r.status === 'atrasada').length;
-        this.stats.totalFines = reservations.items.reduce(
-          (acc, curr) => acc + (curr.multa?.valorTotal || 0),
-          0,
-        );
+        // Multas pendentes = apenas de reservas ATRASADAS (não concluídas)
+        this.stats.totalFines = reservations.items
+          .filter((r) => r.status === 'atrasada')
+          .reduce((acc, curr) => acc + (curr.multa?.valorTotal || 0), 0);
 
         // Dados para o gráfico de Rosca (Livros)
         this.bookStatusData = [
